@@ -98,4 +98,14 @@ export const PUBLISHED: ReadonlySet<string> = new Set([
   'academy-5-reasons-why-zoom-was-able-to-support-300-million-video-calls-a-day',
   'academy-how-uber-computes-eta-at-half-a-million-requests-per-second',
   'academy-what-is-context-engineering',
+  // batch 11
+  'source-cache-eviction-policies',
+  'source-how-can-cache-systems-go-wrong',
+  'source-how-do-we-incorporate-event-sourcing-into-systems',
+  'source-how-does-garbage-collection-work',
+  'source-how-browsers-render-web-pages',
+  'source-paging-vs-segmentation',
+  'academy-this-is-how-stripe-does-rate-limiting-to-build-scalable-apis',
+  'source-swift-payment-messaging-system',
+  'academy-prompt-engineering-a-deep-dive',
 ]);
