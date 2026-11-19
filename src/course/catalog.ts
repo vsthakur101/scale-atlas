@@ -62,10 +62,10 @@ export const MODULES: ModuleDef[] = [
     title: 'Reliability',
     tone: 'blue',
     lessons: [
-      { slug: 'failover', title: 'Redundancy & Failover' },
-      { slug: 'rate-limiting', title: 'Rate Limiting' },
-      { slug: 'timeouts-retries', title: 'Timeouts, Retries & Breakers' },
-      { slug: 'observability', title: 'Observability' },
+      { slug: 'failover', title: 'Redundancy & Failover', load: () => import('./lessons/failover') },
+      { slug: 'rate-limiting', title: 'Rate Limiting', load: () => import('./lessons/rate-limiting') },
+      { slug: 'timeouts-retries', title: 'Timeouts, Retries & Breakers', load: () => import('./lessons/timeouts-retries') },
+      { slug: 'observability', title: 'Observability', load: () => import('./lessons/observability') },
     ],
   },
   {
