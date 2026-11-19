@@ -19,7 +19,8 @@ npm run build      # typecheck + production bundle in dist/
 | 03 Data & Storage | Choosing a Database · Indexes · B-Trees & LSM Trees · Replication · Partitioning · Consistent Hashing · Generating IDs · Consistency Models · Leader Election & Consensus · Transactions · Blob Storage | written |
 | 04 Communication | API Styles · Queues · Events & Pub/Sub · Push: Polling to WebSockets | written |
 | 05 Reliability | Redundancy & Failover · Rate Limiting · Timeouts, Retries & Breakers · Observability | written |
-| 06–09 | Architecture, Security, Shipping, Case Studies (13 lessons) | listed as "soon" |
+| 06 Architecture | Monolith to Services · Service Discovery · Sagas · Batch & Streams | written |
+| 07–09 | Security, Shipping, Case Studies (9 lessons) | listed as "soon" |
 
 Shell features: course tree with per-module progress, lesson stepper, keyboard nav (`←` `→` `R` `Space` `/` `⌘K`), swipe on touch, search palette over concepts and steps, light/dark theme with no flash, three layouts (desktop / tablet drawer / stacked phone), read-aloud, copy step link, print-a-lesson view, reduced-motion support. Practice / Design Lab / Cheatsheets tabs and the language menu are placeholders.
 

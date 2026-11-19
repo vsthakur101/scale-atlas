@@ -73,10 +73,10 @@ export const MODULES: ModuleDef[] = [
     title: 'Architecture',
     tone: 'red',
     lessons: [
-      { slug: 'services', title: 'Monolith to Services' },
-      { slug: 'discovery', title: 'Service Discovery' },
-      { slug: 'sagas', title: 'Sagas' },
-      { slug: 'batch-streams', title: 'Batch & Streams' },
+      { slug: 'services', title: 'Monolith to Services', load: () => import('./lessons/services') },
+      { slug: 'discovery', title: 'Service Discovery', load: () => import('./lessons/discovery') },
+      { slug: 'sagas', title: 'Sagas', load: () => import('./lessons/sagas') },
+      { slug: 'batch-streams', title: 'Batch & Streams', load: () => import('./lessons/batch-streams') },
     ],
   },
   {
