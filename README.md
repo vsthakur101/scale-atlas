@@ -20,7 +20,9 @@ npm run build      # typecheck + production bundle in dist/
 | 04 Communication | API Styles · Queues · Events & Pub/Sub · Push: Polling to WebSockets | written |
 | 05 Reliability | Redundancy & Failover · Rate Limiting · Timeouts, Retries & Breakers · Observability | written |
 | 06 Architecture | Monolith to Services · Service Discovery · Sagas · Batch & Streams | written |
-| 07–09 | Security, Shipping, Case Studies (9 lessons) | listed as "soon" |
+| 07 Security | Authentication · Authorization · Encryption & Secrets | written |
+| 08 Shipping | Testing at Scale · Deploy Strategies | written |
+| 09 Case Studies | From Requirements to Design · A Link Shortener · A Social Feed · A Messaging App | listed as "soon" |
 
 Shell features: course tree with per-module progress, lesson stepper, keyboard nav (`←` `→` `R` `Space` `/` `⌘K`), swipe on touch, search palette over concepts and steps, light/dark theme with no flash, three layouts (desktop / tablet drawer / stacked phone), read-aloud, copy step link, print-a-lesson view, reduced-motion support. Practice / Design Lab / Cheatsheets tabs and the language menu are placeholders.
 

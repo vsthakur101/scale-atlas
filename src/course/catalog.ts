@@ -84,9 +84,9 @@ export const MODULES: ModuleDef[] = [
     title: 'Security',
     tone: 'teal',
     lessons: [
-      { slug: 'authn', title: 'Authentication' },
-      { slug: 'authz', title: 'Authorization' },
-      { slug: 'encryption', title: 'Encryption & Secrets' },
+      { slug: 'authn', title: 'Authentication', load: () => import('./lessons/authn') },
+      { slug: 'authz', title: 'Authorization', load: () => import('./lessons/authz') },
+      { slug: 'encryption', title: 'Encryption & Secrets', load: () => import('./lessons/encryption') },
     ],
   },
   {
@@ -94,8 +94,8 @@ export const MODULES: ModuleDef[] = [
     title: 'Shipping',
     tone: 'sand',
     lessons: [
-      { slug: 'testing', title: 'Testing at Scale' },
-      { slug: 'deploys', title: 'Deploy Strategies' },
+      { slug: 'testing', title: 'Testing at Scale', load: () => import('./lessons/testing') },
+      { slug: 'deploys', title: 'Deploy Strategies', load: () => import('./lessons/deploys') },
     ],
   },
   {
