@@ -75,7 +75,7 @@ function renderShell(): void {
     </a>
     <nav class="tabs" aria-label="Sections">
       <button class="tab active" data-tab="learn">${icon('learn', 15)}<span>Learn</span></button>
-      <button class="tab" data-tab="Practice">${icon('dumbbell', 15)}<span>Practice</span></button>
+      <button class="tab" data-tab="practice">${icon('dumbbell', 15)}<span>Practice</span></button>
       <button class="tab" data-tab="Design Lab">${icon('flask', 15)}<span>Design Lab</span></button>
       <button class="tab" data-tab="Cheatsheets">${icon('sheet', 15)}<span>Cheatsheets</span></button>
     </nav>
@@ -95,7 +95,7 @@ function renderShell(): void {
       </a>
     </div>
   </header>
-  <div class="shell">
+  <div class="shell" id="learn-view">
     <aside class="sidebar" id="sidebar" aria-label="Course outline">
       <div class="sb-head"><span>${icon('folder', 15)} Course</span><small>${ALL_LESSONS.length} lessons</small></div>
       <nav class="tree" id="tree"></nav>
@@ -121,6 +121,7 @@ function renderShell(): void {
       <section class="card goals-card" id="goals"></section>
     </div>
   </div>
+  <div class="shell practice-shell" id="practice-view" hidden></div>
   <div class="scrim" id="scrim"></div>
   <div class="print-view" id="print-view"></div>`;
 
@@ -130,8 +131,18 @@ function renderShell(): void {
   $('#theme-btn').addEventListener('click', () => setTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
   $('#replay-btn').addEventListener('click', () => replay());
   $('#pause-btn').addEventListener('click', () => togglePause());
-  document.querySelectorAll<HTMLButtonElement>('.tab:not(.active)').forEach((b) =>
-    b.addEventListener('click', () => toast(`${b.dataset.tab} is coming soon`, 'sparkle')),
+  document.querySelectorAll<HTMLButtonElement>('.tab').forEach((b) =>
+    b.addEventListener('click', () => {
+      const tab = b.dataset.tab;
+      if (tab === 'learn') {
+        const last = load<{ slug: string; step: number } | null>('last', null);
+        location.hash = last ? `#/${last.slug}/${last.step}` : `#/${BUILT_LESSONS[0]!.slug}/1`;
+      } else if (tab === 'practice') {
+        location.hash = '#/practice';
+      } else {
+        toast(`${tab} is coming soon`, 'sparkle');
+      }
+    }),
   );
   const langBtn = $('#lang-btn');
   const langMenu = $('#lang-menu');
@@ -490,8 +501,49 @@ function go(slug: string, stepNo: number): void {
 }
 
 let routeToken = 0;
+type View = 'learn' | 'practice';
+let currentView: View = 'learn';
+let practice: typeof import('./practice/view') | null = null;
+
+function setView(v: View): void {
+  currentView = v;
+  document.body.dataset.view = v;
+  $('#learn-view').hidden = v !== 'learn';
+  $('#practice-view').hidden = v !== 'practice';
+  document.querySelectorAll<HTMLButtonElement>('.tab').forEach((b) => {
+    const on = b.dataset.tab === v;
+    b.classList.toggle('active', on);
+    if (on) b.setAttribute('aria-current', 'page');
+    else b.removeAttribute('aria-current');
+  });
+  toggleDrawer(false);
+  if (v !== 'learn' && speaking) toggleSpeech();
+}
+
+async function routePracticeView(): Promise<void> {
+  const token = ++routeToken;
+  try {
+    practice ??= await import('./practice/view');
+  } catch (err) {
+    console.error('Failed to load practice', { err });
+    toast('Practice failed to load. Check your connection and retry.', 'alert', 4000);
+    return;
+  }
+  if (token !== routeToken) return;
+  practice.mountPractice($('#practice-view'));
+  setView('practice');
+  practice.routePractice(location.hash);
+}
 
 async function route(): Promise<void> {
+  if (location.hash.startsWith('#/practice')) {
+    await routePracticeView();
+    return;
+  }
+  if (currentView !== 'learn') {
+    setView('learn');
+    if (lesson) document.title = `${lesson.title} · ${SITE.name}`;
+  }
   const m = location.hash.match(/^#\/([\w-]+)(?:\/(\d+))?/);
   const fallback = load<{ slug: string; step: number } | null>('last', null);
   let slug = m?.[1] ?? fallback?.slug ?? BUILT_LESSONS[0]!.slug;
@@ -553,6 +605,17 @@ function onKey(e: KeyboardEvent): void {
   if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
   if (document.querySelector('.palette')) return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (currentView === 'practice') {
+    if (practice?.onPracticeKey(e)) {
+      e.preventDefault();
+      return;
+    }
+    if (e.key === '/') {
+      e.preventDefault();
+      openSearch({ loadLesson, go });
+    } else if (e.key === 'Escape') toggleDrawer(false);
+    return;
+  }
   switch (e.key) {
     case 'ArrowRight':
       e.preventDefault();

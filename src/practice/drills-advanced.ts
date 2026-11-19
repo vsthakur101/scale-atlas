@@ -1,0 +1,301 @@
+import { box, db, disk, flow, link, pill, you } from '../course/kit';
+import type { Drill } from './types';
+
+/* Drills for modules 6–9: Architecture, Security, Shipping, Case Studies. */
+
+export const architecture: Drill[] = [
+  {
+    id: 'a-dist-monolith',
+    kind: 'choice',
+    prompt: 'You have 25 services, but every feature touches six of them and they must be released together. What’s going on?',
+    options: [
+      { text: 'A distributed monolith: boundaries were drawn by layer, not by domain', correct: true, why: 'Lock-step releases mean the services are coupled; redraw boundaries around business capabilities.' },
+      { text: 'Too few services; split further', why: 'More pieces with the same coupling makes it worse.' },
+      { text: 'The CI pipeline is too slow', why: 'Speeding up builds doesn’t remove the need to release together.' },
+      { text: 'Missing a service mesh', why: 'A mesh handles networking, not domain coupling.' },
+    ],
+    explain: 'Services pay off when each can change and deploy alone. If they can’t, you have the costs of distribution without the benefits.',
+    ref: { slug: 'services', step: 7 },
+  },
+  {
+    id: 'a-shutdown',
+    kind: 'choice',
+    prompt: 'Every deploy of the Payments service causes a burst of failed calls from Orders. Which shutdown order fixes it?',
+    options: [
+      { text: 'Deregister → wait for callers to update and requests to drain → exit', correct: true, why: 'Callers stop sending before the instance stops listening.' },
+      { text: 'Exit immediately on SIGTERM', why: 'In-flight requests are cut off and cached lists still point here.' },
+      { text: 'Exit, then deregister', why: 'Callers keep sending to an instance that’s already gone.' },
+      { text: 'Lower the registry TTL to 1 s and exit immediately', why: 'Shrinks the window but still drops in-flight requests.' },
+    ],
+    explain: 'Remove yourself from discovery first, drain, then stop. Register only once ready on the way up.',
+    ref: { slug: 'discovery', step: 6 },
+  },
+  {
+    id: 'a-compensate',
+    kind: 'choice',
+    prompt: 'A saga must cancel a hotel booking as compensation, but the hotel API is returning 503. What should the saga do?',
+    options: [
+      { text: 'Retry the idempotent cancellation with backoff; escalate to a human after a deadline', correct: true, why: 'Compensations must eventually succeed; idempotency makes retries safe.' },
+      { text: 'Skip it and mark the trip as failed', why: 'The customer stays booked — and charged — for a hotel.' },
+      { text: 'Roll back the database transaction', why: 'The hotel booking committed in another service; there’s no shared transaction.' },
+      { text: 'Re-run the whole saga from the start', why: 'Books things again instead of undoing them.' },
+    ],
+    explain: 'Sagas trade atomicity for compensations — which therefore need retries, idempotency, durable state and a human fallback.',
+    ref: { slug: 'sagas', step: 8 },
+  },
+  {
+    id: 'a-late-events',
+    kind: 'choice',
+    prompt: 'A trip ended at 12:00:58 but its event reaches the stream job at 12:03. It must count in the 12:00 minute. What does the job need?',
+    options: [
+      { text: 'Event-time windows with a watermark and allowed lateness', correct: true, why: 'Windows follow when things happened; lateness rules decide how long to wait and how to update.' },
+      { text: 'Processing-time windows', why: 'That counts it in 12:03 — the wrong minute.' },
+      { text: 'A faster cluster', why: 'The delay happened before the event reached you.' },
+      { text: 'Batch the data nightly instead', why: 'Correct, but a day late — the requirement was minutes.' },
+    ],
+    explain: 'Stream processing must separate event time from processing time; watermarks tell it when a window is probably complete.',
+    ref: { slug: 'batch-streams', step: 5 },
+  },
+  {
+    id: 'a-analytics-primary',
+    kind: 'spot',
+    prompt: 'Riders see slow requests every night at 02:00. Click the workload that should move off this database first.',
+    scene: {
+      nodes: [
+        box('app', -11, 0, 'Ride app', 'blue', 'server', { size: [1.4, 1.4], height: 40, load: 30 }),
+        db('prim', -2, 0, 'Primary DB', { load: 96 }),
+        box('report', -2, 9, 'Revenue report', 'grey', 'sheet', { size: [1.3, 1.3], height: 30, tag: pill('scan 1B rows · 3 h', 'clock') }),
+      ],
+      links: [link('app', 'prim', { arrow: 'both' }), link('report', 'prim', { arrow: 'both' })],
+      flows: [flow(['app', 'prim'], { back: true, rate: 2, speed: 0.5 }), flow(['report', 'prim'], { kind: 'heavy', back: true, rate: 0.8, speed: 0.3 })],
+    },
+    answer: 'report',
+    why: { app: 'The app is the workload this database exists to serve.', prim: 'The database is overloaded, but the cure is to remove the analytics load from it.' },
+    explain: 'Analytics scans belong on a replica, a warehouse or a data lake — never on the database serving users.',
+    ref: { slug: 'batch-streams', step: 2 },
+  },
+];
+
+export const security: Drill[] = [
+  {
+    id: 'x-password-storage',
+    kind: 'choice',
+    prompt: 'How should you store user passwords?',
+    options: [
+      { text: 'Argon2id (or bcrypt/scrypt) with a unique salt per user', correct: true, why: 'Deliberately slow, salted hashes make leaked tables very expensive to crack.' },
+      { text: 'SHA-256 of the password', why: 'Fast hashes can be brute-forced at billions of guesses per second.' },
+      { text: 'AES-encrypted with a key in the config', why: 'Whoever gets the key gets every password back.' },
+      { text: 'Base64-encoded', why: 'Encoding isn’t protection at all.' },
+    ],
+    explain: 'Passwords should be one-way, slow and salted.',
+    ref: { slug: 'authn', step: 1 },
+  },
+  {
+    id: 'x-idor',
+    kind: 'choice',
+    prompt: 'Changing /invoices/4471 to /invoices/4470 shows another company’s invoice. The fix:',
+    options: [
+      { text: 'Check the caller may access that specific invoice on every request; deny by default', correct: true, why: 'Authorization must be per object, on the server.' },
+      { text: 'Use random UUIDs instead of numbers', why: 'Harder to guess, but still readable by anyone who gets the ID.' },
+      { text: 'Hide the invoice ID from the URL', why: 'IDs leak in many ways; access still isn’t checked.' },
+      { text: 'Require login', why: 'The attacker is already logged in.' },
+    ],
+    explain: 'Authentication says who you are; authorization must check what you may access — every object, every time.',
+    ref: { slug: 'authz', step: 2 },
+  },
+  {
+    id: 'x-leaked-secret',
+    kind: 'spot',
+    prompt: 'A production credential was committed to git and scraped by a bot. Click the system whose credential must be rotated first.',
+    scene: {
+      nodes: [
+        you('you', -12, 1, { label: pill('patient', 'user') }),
+        box('app', 3, 0, 'Clinic app', 'blue', 'server', { size: [1.5, 1.5], height: 42 }),
+        db('db', 10, 0, 'Records DB'),
+        disk('repo', -4, -9, 'git repo', { tone: 'grey', icon: 'file', size: [1.6, 1.2], height: 18, tag: pill('DB_PASSWORD=… (in history)', 'alert') }),
+      ],
+      links: [link('you', 'app'), link('app', 'db', { arrow: 'both' })],
+      flows: [flow(['you', 'app', 'db'], { back: true, rate: 1 })],
+    },
+    answer: 'db',
+    why: { repo: 'Deleting the commit doesn’t help — the secret is already copied. Rotate what it unlocks.', app: 'The app needs the new credential, but the exposed secret is the database’s.' },
+    explain: 'Treat any secret that touched source control as compromised: rotate it at the system it unlocks, then move secrets into a secrets manager.',
+    ref: { slug: 'encryption', step: 7 },
+  },
+  {
+    id: 'x-token-storage',
+    kind: 'choice',
+    prompt: 'Where should a browser app keep its session credential?',
+    options: [
+      { text: 'An HttpOnly, Secure, SameSite cookie', correct: true, why: 'Page scripts can’t read it, so injected JavaScript can’t steal it.' },
+      { text: 'localStorage', why: 'Any script on the page — including a compromised third-party one — can read it.' },
+      { text: 'A global JavaScript variable', why: 'Equally readable by injected scripts.' },
+      { text: 'A query-string parameter', why: 'Ends up in logs, history and Referer headers.' },
+    ],
+    explain: 'Keep credentials out of reach of JavaScript, keep them short-lived, and restrict third-party scripts.',
+    ref: { slug: 'authn', step: 5 },
+  },
+  {
+    id: 'x-envelope',
+    kind: 'choice',
+    prompt: 'You encrypt sensitive fields in the application. Where should the master key live?',
+    options: [
+      { text: 'In a KMS/HSM; the app only ever handles wrapped data keys', correct: true, why: 'The master key never leaves the KMS, and every use is access-controlled and audited.' },
+      { text: 'In the database next to the data', why: 'Whoever steals the data gets the key too.' },
+      { text: 'In an environment variable', why: 'Better than the repo, but long-lived, widely copied and unaudited.' },
+      { text: 'Hard-coded in the source', why: 'Anyone with the code has the key.' },
+    ],
+    explain: 'Envelope encryption: data keys encrypt data, a KMS-held master key wraps the data keys.',
+    ref: { slug: 'encryption', step: 5 },
+  },
+];
+
+export const shipping: Drill[] = [
+  {
+    id: 'p-canary-blast',
+    kind: 'estimate',
+    prompt: 'You get 1M users an hour. A bad release goes to a 1% canary and runs 30 minutes before rollback. Roughly how many users were affected?',
+    answer: 5000,
+    unit: 'users',
+    explain: '1,000,000 × 0.5 h × 1% = 5,000 — versus 500,000 for a full release. Automated canary analysis shrinks it further.',
+    ref: { slug: 'deploys', step: 4 },
+  },
+  {
+    id: 'p-rename-column',
+    kind: 'choice',
+    prompt: 'You need to rename the address column while doing canary deploys. What’s the safe plan?',
+    options: [
+      { text: 'Add the new column, write both, backfill, switch reads, drop the old one later', correct: true, why: 'Expand/contract: every step works with both the previous and the next version.' },
+      { text: 'Rename it in the same release as the code change', why: 'The old version — still running during the canary — breaks immediately.' },
+      { text: 'Take a maintenance window', why: 'Works, but gives up continuous delivery.' },
+      { text: 'Rename it, then deploy code quickly', why: 'Everything running in between breaks.' },
+    ],
+    explain: 'Schema changes must be backward-compatible with whatever code is still running. Destructive steps go last, separately.',
+    ref: { slug: 'deploys', step: 6 },
+  },
+  {
+    id: 'p-flaky',
+    kind: 'choice',
+    prompt: 'Some end-to-end tests fail 1 run in 20 for no clear reason, and people now re-run until green. Best response?',
+    options: [
+      { text: 'Quarantine them out of the blocking path with an owner, and fix the root causes', correct: true, why: 'Restores trust in red builds while the flakiness gets fixed.' },
+      { text: 'Automatically retry failed tests 3 times', why: 'Hides real failures along with flaky ones.' },
+      { text: 'Delete all end-to-end tests', why: 'Loses coverage of critical journeys.' },
+      { text: 'Ignore it — 95% pass rate is fine', why: 'People already ignore red builds; real bugs will slip through.' },
+    ],
+    explain: 'A test suite is only useful if failures are believed. Track, quarantine and fix flaky tests.',
+    ref: { slug: 'testing', step: 4 },
+  },
+  {
+    id: 'p-build-once',
+    kind: 'choice',
+    prompt: 'Your pipeline rebuilds the container separately for staging and production. What’s the risk?',
+    options: [
+      { text: 'Production runs an artifact that was never tested', correct: true, why: 'Different dependency resolutions or base images can differ between builds.' },
+      { text: 'None — the source is identical', why: 'Builds aren’t always reproducible: floating dependency versions, base image updates.' },
+      { text: 'Slower builds only', why: 'Speed is the smaller problem.' },
+      { text: 'Higher registry storage', why: 'Trivial compared to shipping something untested.' },
+    ],
+    explain: 'Build once, tag by digest, promote the same artifact through every environment; vary only configuration.',
+    ref: { slug: 'deploys', step: 8 },
+  },
+  {
+    id: 'p-load-knee',
+    kind: 'spot',
+    prompt: 'During a load test, latency climbs steeply at 4,200 req/s. Click the first resource to saturate.',
+    scene: {
+      nodes: [
+        box('gen', -10, 0, 'Load generator', 'red', 'bolt', { size: [1.4, 1.4], height: 36, tag: pill('4,200 req/s', 'activity') }),
+        box('stage', 0, 0, 'App servers', 'blue', 'server', { size: [1.6, 1.6], height: 44, load: 55 }),
+        db('sdb', 8, 0, 'Database', { load: 60, tag: pill('connections: 50 / 50', 'link') }),
+      ],
+      links: [link('gen', 'stage'), link('stage', 'sdb', { arrow: 'both' })],
+      flows: [flow(['gen', 'stage', 'sdb'], { back: true, rate: 5, speed: 0.6 })],
+    },
+    answer: 'sdb',
+    why: { stage: 'App CPU is only 55% — they’re waiting for database connections.', gen: 'The generator is the test harness.' },
+    explain: 'The connection pool (50/50) saturates before CPU does. Raise it carefully, or reduce how long each request holds a connection.',
+    ref: { slug: 'testing', step: 5 },
+  },
+];
+
+export const cases: Drill[] = [
+  {
+    id: 'k-link-storage',
+    kind: 'estimate',
+    prompt: 'A link shortener stores 100 million new links a month at about 500 bytes each. How many gigabytes per year?',
+    answer: 600,
+    unit: 'GB/yr',
+    explain: '100M × 500 B = 50 GB a month ≈ 600 GB a year — small data with an enormous read path.',
+    ref: { slug: 'link-shortener', step: 2 },
+  },
+  {
+    id: 'k-redirect-code',
+    kind: 'choice',
+    prompt: 'Your link shortener needs per-click analytics and the ability to disable abusive links. Which redirect status?',
+    options: [
+      { text: '302 Found', correct: true, why: 'Every click comes back through you, so you can count it and change or disable the target.' },
+      { text: '301 Moved Permanently', why: 'Browsers cache it forever; later clicks bypass you entirely.' },
+      { text: '200 with a JavaScript redirect', why: 'Slower, breaks for non-browser clients, and is a phishing pattern.' },
+      { text: '404 then retry', why: 'Not a redirect.' },
+    ],
+    explain: '301 saves traffic but gives up control and analytics; most shorteners use 302 or short-cached redirects.',
+    ref: { slug: 'link-shortener', step: 5 },
+  },
+  {
+    id: 'k-celebrity',
+    kind: 'spot',
+    prompt: 'An account with 80M followers posts, and everyone’s posts start appearing minutes late. Click the overwhelmed component.',
+    scene: {
+      nodes: [
+        you('author', -13, -6, { label: pill('celebrity', 'sparkle') }),
+        box('post', -5, -6, 'Post service', 'blue', 'server', { size: [1.3, 1.3], height: 36, load: 25 }),
+        box('feed', -5, 5, 'Feed service', 'orange', 'list', { size: [1.4, 1.4], height: 38, load: 30 }),
+        db('posts', 4, -8, 'Posts'),
+        box('tl', 4, 8, 'Timelines', 'red', 'layers', { size: [1.5, 1.5], height: 38, load: 70 }),
+        box('fan', 11, -3, 'Fan-out workers', 'purple', 'share', { size: [1.3, 1.3], height: 34, load: 100, tag: pill('backlog: 9 min', 'clock') }),
+      ],
+      links: [link('author', 'post'), link('post', 'posts'), link('post', 'fan', { style: 'dashed' }), link('fan', 'tl'), link('feed', 'tl', { arrow: 'both' })],
+      flows: [flow(['author', 'post', 'fan'], { kind: 'write', rate: 0.6 }), flow(['fan', 'tl'], { kind: 'heavy', rate: 6, speed: 0.5 })],
+    },
+    answer: 'fan',
+    why: { tl: 'Timelines are busy absorbing writes, but the backlog is in fan-out.', post: 'Saving the post is quick; the expensive part comes after.' },
+    explain: 'Fan-out on write turns one celebrity post into 80M inserts. Pull very large accounts at read time instead (hybrid fan-out).',
+    ref: { slug: 'social-feed', step: 4 },
+  },
+  {
+    id: 'k-timeline-ram',
+    kind: 'estimate',
+    prompt: 'Timelines keep the latest 800 post IDs (8 bytes each) for 200M users. How many terabytes of memory?',
+    answer: 1.3,
+    unit: 'TB',
+    explain: '200M × 800 × 8 B ≈ 1.28 TB — feasible in a sharded in-memory cluster because you store IDs, not posts.',
+    ref: { slug: 'social-feed', step: 6 },
+  },
+  {
+    id: 'k-chat-order',
+    kind: 'choice',
+    prompt: 'Group-chat members see messages in different orders because device clocks disagree. What defines the order?',
+    options: [
+      { text: 'A server-assigned, per-conversation sequence number', correct: true, why: 'One authority, one order — and clients can detect gaps.' },
+      { text: 'The sender’s device timestamp', why: 'Device clocks drift and can be set arbitrarily.' },
+      { text: 'Arrival time at each recipient', why: 'Different for every recipient — the problem you started with.' },
+      { text: 'Message ID sorted alphabetically', why: 'Random IDs carry no order.' },
+    ],
+    explain: 'The chat service stamps each message with the next sequence number in its conversation before acknowledging it.',
+    ref: { slug: 'messaging', step: 5 },
+  },
+  {
+    id: 'k-double-book',
+    kind: 'choice',
+    prompt: 'Two patients click the last slot at the same instant; both saw it as free. How do you guarantee one booking?',
+    options: [
+      { text: 'A unique constraint on the slot, enforced by the database', correct: true, why: 'The second insert fails atomically and gets a 409.' },
+      { text: 'Check availability in the app before inserting', why: 'Both checks pass before either insert — a classic race.' },
+      { text: 'Refresh the search cache more often', why: 'Stale reads are fine; the write path is what must be correct.' },
+      { text: 'Add a CDN', why: 'Unrelated to correctness.' },
+    ],
+    explain: 'Put invariants where they can be enforced atomically — usually the database — and let reads be fast and slightly stale.',
+    ref: { slug: 'requirements', step: 7 },
+  },
+];

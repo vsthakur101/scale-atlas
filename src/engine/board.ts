@@ -332,6 +332,8 @@ function pointAt(path: Pt[], lens: number[], t: number): Pt {
 
 // ───────────────────────────── board ─────────────────────────────
 
+let boardSeq = 0;
+
 export class Board {
   readonly svg: SVGSVGElement;
   private zones: SVGGElement;
@@ -350,6 +352,9 @@ export class Board {
   private vb: ViewBox = { x: -400, y: -260, w: 800, h: 520 };
   private vbTween: { from: ViewBox; to: ViewBox; start: number } | null = null;
   private reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** ids for <defs> are per-board: a url(#…) into a hidden SVG renders nothing */
+  private uid = `b${++boardSeq}`;
+  private clickHandler: ((id: string) => void) | null = null;
 
   constructor(host: HTMLElement) {
     host.innerHTML = '';
@@ -359,10 +364,10 @@ export class Board {
     this.svg.setAttribute('role', 'img');
     const tw = 2 * C * S;
     this.svg.innerHTML =
-      `<defs><pattern id="iso-grid" width="${tw}" height="${S}" patternUnits="userSpaceOnUse">` +
+      `<defs><pattern id="${this.uid}-grid" width="${tw}" height="${S}" patternUnits="userSpaceOnUse">` +
       `<path d="M0,${S / 2} L${tw / 2},0 L${tw},${S / 2} L${tw / 2},${S} Z" class="grid-line"/></pattern>` +
-      `<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1,1 L9,5 L1,9" class="arrow-head"/></marker></defs>` +
-      `<rect class="grid-bg" x="-3000" y="-3000" width="6000" height="6000" fill="url(#iso-grid)"/>`;
+      `<marker id="${this.uid}-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1,1 L9,5 L1,9" class="arrow-head"/></marker></defs>` +
+      `<rect class="grid-bg" x="-3000" y="-3000" width="6000" height="6000" fill="url(#${this.uid}-grid)"/>`;
     const layer = (cls: string) => {
       const g = document.createElementNS(NS, 'g');
       g.setAttribute('class', cls);
@@ -377,7 +382,27 @@ export class Board {
     this.pills = layer('l-pills');
     host.appendChild(this.svg);
     this.applyViewBox(this.vb);
+    this.svg.addEventListener('click', (e) => {
+      if (!this.clickHandler) return;
+      const g = (e.target as Element).closest<SVGGElement>('.l-nodes > g.node, .l-pills > g.pillset');
+      const id = g?.dataset.id;
+      if (id) this.clickHandler(id);
+    });
     this.raf = requestAnimationFrame(this.tick);
+  }
+
+  /** Make nodes clickable (practice drills). Pass null to turn it off. */
+  setClickHandler(fn: ((id: string) => void) | null): void {
+    this.clickHandler = fn;
+    this.svg.classList.toggle('clickable', !!fn);
+  }
+
+  /** Outline a node as a right or wrong pick; null clears it. */
+  mark(id: string, tone: 'good' | 'bad' | null): void {
+    const g = this.nodes.querySelector<SVGGElement>(`:scope > g[data-id="${CSS.escape(id)}"]`);
+    if (!g) return;
+    g.classList.remove('mark-good', 'mark-bad');
+    if (tone) g.classList.add(`mark-${tone}`);
   }
 
   destroy(): void {
@@ -502,8 +527,8 @@ export class Board {
       const x2 = pb.x - ux * rb;
       const y2 = pb.y - uy * rb;
       const arrow = l.arrow ?? 'end';
-      const ms = arrow === 'both' ? ' marker-start="url(#arrow)"' : '';
-      const me = arrow !== 'none' ? ' marker-end="url(#arrow)"' : '';
+      const ms = arrow === 'both' ? ` marker-start="url(#${this.uid}-arrow)"` : '';
+      const me = arrow !== 'none' ? ` marker-end="url(#${this.uid}-arrow)"` : '';
       s += `<line class="link link-${l.style ?? 'solid'}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"${ms}${me}/>`;
       if (l.style === 'broken') {
         const mx = (x1 + x2) / 2;
@@ -563,6 +588,7 @@ export class Board {
     this.last = now;
     this.stepViewBox(now);
     if (this.paused || this.reduceMotion) return;
+    if (!this.svg.isConnected || this.svg.getBoundingClientRect().width === 0) return;
 
     for (const fr of this.flows) {
       fr.acc += dt * (fr.flow.rate ?? 1.2);
