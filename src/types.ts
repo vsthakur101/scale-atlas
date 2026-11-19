@@ -110,6 +110,25 @@ export interface MetricDef {
   icon: IconName;
 }
 
+export interface DynamicParameter {
+  key: string;
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  default: number;
+  unit: string;
+  description?: string;
+}
+
+export interface DynamicLessonModel {
+  parameters: DynamicParameter[];
+  calculate: (
+    input: Record<string, number>,
+    stepIndex: number,
+  ) => Record<string, string | MetricValue>;
+}
+
 export interface Goal {
   text: string;
   /** 1-based step that teaches it */
@@ -128,6 +147,7 @@ export interface Lesson {
   goals: Goal[];
   legend: FlowKind[];
   steps: Step[];
+  dynamic?: DynamicLessonModel;
 }
 
 export interface LessonRef {

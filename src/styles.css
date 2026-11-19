@@ -279,6 +279,48 @@ mark { background: var(--hl); color: inherit; border-radius: 3px; padding: 0 2px
 .diagram { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 .diag-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 10px 10px 0; position: relative; z-index: 2; }
 .metrics { display: flex; gap: 6px; flex-wrap: wrap; }
+.dynamic-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex: 1;
+  min-width: 220px;
+  padding: 0 4px;
+}
+.dynamic-label {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 5px;
+  color: var(--ink-3);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.dynamic-label button {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel);
+}
+.dynamic-control {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 110px;
+  color: var(--ink-3);
+  font-size: 9.5px;
+}
+.dynamic-control span { display: flex; justify-content: space-between; gap: 6px; }
+.dynamic-control b { color: var(--ink-2); font-size: 9.5px; }
+.dynamic-control input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent-2);
+}
 .metric {
   min-width: 92px; padding: 5px 9px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 9px;
   display: flex; flex-direction: column; line-height: 1.3;
@@ -528,6 +570,13 @@ mark { background: var(--hl); color: inherit; border-radius: 3px; padding: 0 2px
 :root[data-layout='stack'] .metrics { order: 2; width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
 :root[data-layout='stack'] .metric { min-width: 84px; flex: none; }
 :root[data-layout='stack'] .diag-ctrl { margin-left: auto; }
+:root[data-layout='stack'] .dynamic-controls {
+  order: 3;
+  width: 100%;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+:root[data-layout='stack'] .dynamic-control { min-width: 130px; }
 :root[data-layout='stack'] .board-host { margin-top: 0; }
 
 .ring-fill { fill: var(--t1); fill-opacity: 0.25; stroke: none !important; }

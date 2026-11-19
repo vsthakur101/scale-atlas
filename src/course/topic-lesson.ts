@@ -1,5 +1,5 @@
 import type { IconName } from '../engine/icons';
-import type { Lesson, Level, MetricDef, MetricValue, Step, Tone } from '../types';
+import type { DynamicLessonModel, DynamicParameter, Lesson, Level, MetricDef, MetricValue, Step, Tone } from '../types';
 import { box, crowd, flow, link, pill, you } from './kit';
 
 export interface TopicLessonOptions {
@@ -289,42 +289,57 @@ const contexts: Record<string, ModuleContext> = {
 
 export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Lesson {
   const ctx = contexts[module] ?? contexts['How it Works?']!;
-  const stepMetrics = (stepIndex: number): Record<string, string | MetricValue> => {
+  const parameters: DynamicParameter[] = [
+    { key: 'traffic', label: 'Traffic', min: 100, max: 20_000, step: 100, default: 3_000, unit: 'req/s', description: 'Illustrative incoming request rate.' },
+    { key: 'capacity', label: 'Target capacity', min: 10, max: 95, step: 5, default: 65, unit: '%', description: 'Illustrative usable capacity.' },
+    { key: 'failure', label: 'Failure rate', min: 0, max: 50, step: 1, default: 5, unit: '%', description: 'Illustrative degraded or failed work.' },
+  ];
+  const stepMetrics = (
+    input: Record<string, number>,
+    stepIndex: number,
+  ): Record<string, string | MetricValue> => {
+    const traffic = input.traffic ?? 3_000;
+    const capacity = input.capacity ?? 65;
+    const failure = input.failure ?? 5;
+    const rho = Math.min(0.97, (traffic / 10_000) / (capacity / 100));
+    const queueFactor = rho >= 0.97 ? 60 : 1 + (3 * rho * rho) / (1 - rho);
+    const baseLatency = stableNumber(title, stepIndex + 1, 22, 360);
+    const stepFactor = [1, 0.82, 0.68, 0.74, 1.85, 0.72][stepIndex] ?? 1;
     const result: Record<string, string | MetricValue> = {};
     for (const metric of ctx.metrics) {
-      const factor = [1, 0.82, 0.68, 0.74, 1.85, 0.72][stepIndex] ?? 1;
+      const factor = stepFactor;
       const seed = stepIndex + 1;
       let value = '';
       let tone: 'good' | 'bad' | 'warn' | undefined;
       const key = metric.key;
 
       if (key === 'latency' || key === 'p99' || key === 'lag' || key === 'loop' || key === 'lead' || key === 'feedback' || key === 'deploy') {
-        const ms = stableNumber(title, seed, 22, 360);
-        const adjusted = Math.round(ms * factor);
-        value = `${adjusted} ms`;
-        tone = adjusted > ms * 1.4 ? 'bad' : adjusted < ms * 0.8 ? 'good' : undefined;
+        const adjusted = Math.round(baseLatency * queueFactor * factor * (1 + failure / 100));
+        value = `~${adjusted} ms`;
+        tone = rho > 0.85 || stepIndex === 4 ? 'bad' : rho < 0.55 && stepIndex !== 4 ? 'good' : 'warn';
       } else if (key === 'qps' || key === 'traffic' || key === 'rps' || key === 'reads' || key === 'writes' || key === 'calls') {
-        const base = stableNumber(title, seed, 800, 18_000);
-        value = key === 'calls' ? `${Math.max(1, Math.round(base / 900))} calls` : formatRate(base);
+        const adjusted = key === 'reads' ? Math.round(traffic * 0.9) : key === 'writes' ? Math.round(traffic * 0.1) : traffic;
+        value = key === 'calls' ? `~${Math.max(1, Math.round(adjusted / 900))} calls` : `~${formatRate(adjusted)}`;
+        tone = failure >= 25 ? 'bad' : rho > 0.85 ? 'warn' : undefined;
       } else if (key === 'payload') {
         const kb = stableNumber(title, seed, 18, 240);
-        value = `${Math.round(kb * factor)} KB`;
+        value = `~${Math.round(kb * factor * (1 + failure / 100))} KB`;
         tone = factor > 1.4 ? 'bad' : factor < 0.8 ? 'good' : undefined;
       } else if (key === 'data') {
-        value = formatBytes(stableNumber(title, seed, 800, 12_000));
+        value = `~${formatBytes(Math.round(traffic * 0.004 * (800 + stableNumber(title, seed, 0, 1200))))}`;
       } else if (key === 'capacity' || key === 'memory') {
-        const pct = Math.round(stableNumber(title, seed, 38, 88) * (stepIndex === 4 ? 1.12 : factor));
+        const pct = Math.round(capacity * (stepIndex === 4 ? 0.72 : stepIndex === 5 ? 1 : factor));
         value = `${Math.min(pct, 99)}%`;
         tone = pct > 90 ? 'bad' : pct < 60 ? 'good' : 'warn';
       } else if (key === 'bandwidth') {
         value = `${stableNumber(title, seed, 120, 9_000)} Mb/s`;
       } else if (key === 'util') {
-        const pct = stableNumber(title, seed, 42, 78);
-        const adjusted = stepIndex === 4 ? Math.min(99, pct + 18) : Math.max(20, Math.round(pct * factor));
+        const pct = Math.round(rho * 100);
+        const adjusted = stepIndex === 4 ? Math.min(99, pct + 18) : Math.max(20, pct);
         value = `${adjusted}%`;
         tone = adjusted > 90 ? 'bad' : adjusted < 65 ? 'good' : 'warn';
       } else if (key === 'hit') {
-        const pct = Math.round(stableNumber(title, seed, 68, 94) * (stepIndex === 4 ? 0.72 : 0.9 + stepIndex * 0.025));
+        const pct = Math.round(Math.min(99, capacity * 0.85 + stableNumber(title, seed, 5, 20) - failure * 0.5) * (stepIndex === 4 ? 0.72 : 1));
         value = `${Math.min(pct, 99)}%`;
         tone = pct >= 90 ? 'good' : pct < 70 ? 'bad' : 'warn';
       } else if (key === 'quality' || key === 'success' || key === 'coverage' || key === 'repro' || key === 'canary' || key === 'detect') {
@@ -484,8 +499,16 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
   ];
 
   steps.forEach((step, index) => {
-    step.scene.metrics = stepMetrics(index);
+    step.scene.metrics = stepMetrics(
+      { traffic: 3_000, capacity: 65, failure: 5 },
+      index,
+    );
   });
+
+  const dynamic: DynamicLessonModel = {
+    parameters,
+    calculate: stepMetrics,
+  };
 
   return {
     slug,
@@ -501,5 +524,6 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
     ],
     legend: ctx.legend,
     steps,
+    dynamic,
   };
 }

@@ -9,6 +9,7 @@ const lesson: Lesson = {
   level: 'Advanced',
   metrics: [
     { key: 'deploy', label: 'Deploy time', icon: 'timer' },
+    { key: 'p99', label: 'p99 latency', icon: 'gauge' },
     { key: 'zones', label: 'Zones', icon: 'globe' },
     { key: 'state', label: 'Local state', icon: 'disk' },
     { key: 'recover', label: 'Recovery', icon: 'refresh' },
@@ -20,6 +21,32 @@ const lesson: Lesson = {
     { text: 'Roll out incrementally and preserve a rollback path', step: 7 },
   ],
   legend: ['request', 'response', 'write', 'fail', 'handshake'],
+  dynamic: {
+    parameters: [
+      { key: 'traffic', label: 'Traffic', min: 100, max: 20_000, step: 100, default: 3_000, unit: ' req/s', description: 'Incoming request rate.' },
+      { key: 'zones', label: 'Healthy zones', min: 1, max: 3, step: 1, default: 2, unit: ' zones', description: 'Availability zones available for serving traffic.' },
+      { key: 'failure', label: 'Instance failure', min: 0, max: 50, step: 1, default: 10, unit: '%', description: 'Share of instances unavailable.' },
+    ],
+    calculate: (input, stepIndex) => {
+      const traffic = input.traffic ?? 3_000;
+      const zones = input.zones ?? 2;
+      const failure = input.failure ?? 10;
+      const zoneCapacity = zones * (1 - failure / 100);
+      const utilization = Math.min(99, Math.round((traffic / 8000 / zoneCapacity) * 100));
+      const queueFactor = utilization >= 97 ? 60 : 1 + (3 * (utilization / 100) ** 2) / (1 - utilization / 100);
+      const p99 = Math.round(28 * queueFactor * (stepIndex === 5 ? 1.8 : 1));
+      const replacement = Math.max(8, Math.round(35 - zones * 6 + failure * 0.8));
+      const recovery = Math.round(replacement + (zones === 1 ? 45 : zones === 2 ? 18 : 8));
+      const surviving = Math.max(0, zones - (stepIndex === 5 ? 1 : 0));
+      return {
+        deploy: { v: `${replacement}s replacement`, tone: replacement <= 30 ? 'good' : replacement <= 50 ? 'warn' : 'bad' },
+        p99: { v: `${p99} ms`, tone: p99 <= 80 ? 'good' : p99 <= 250 ? 'warn' : 'bad' },
+        zones: { v: `${surviving}/${zones} available`, tone: surviving === zones ? 'good' : surviving === 0 ? 'bad' : 'warn' },
+        state: utilization > 90 ? { v: 'at risk', tone: 'bad' } : { v: 'owned externally', tone: 'good' },
+        recover: { v: `${recovery}s target`, tone: recovery <= 30 ? 'good' : recovery <= 60 ? 'warn' : 'bad' },
+      };
+    },
+  },
   steps: [
     {
       short: 'The problem',

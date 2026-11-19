@@ -17,6 +17,8 @@ let board: Board | null = null;
 let prevMetrics: Record<string, string> = {};
 let speaking = false;
 let openModules = new Set<string>(load<string[]>('open-modules', ['foundations']));
+let dynamicValues: Record<string, number> = {};
+let currentDynamicMetrics: Record<string, string | MetricValue> = {};
 
 async function loadLesson(slug: string): Promise<Lesson> {
   const cached = lessons.get(slug);
@@ -106,6 +108,7 @@ function renderShell(): void {
       <section class="card diagram" aria-label="Diagram">
         <div class="diag-top">
           <div class="metrics" id="metrics"></div>
+          <div class="dynamic-controls" id="dynamic-controls"></div>
           <div class="diag-ctrl">
             <button class="ghost-btn" id="replay-btn" title="Replay (R)">${icon('refresh', 14)}<span>Replay</span></button>
             <button class="ghost-btn" id="pause-btn" title="Pause (Space)"></button>
@@ -388,7 +391,7 @@ function renderGoals(): void {
 
 function renderMetrics(s: Step): void {
   if (!lesson) return;
-  const vals = s.scene.metrics ?? {};
+  const vals = lesson.dynamic ? currentDynamicMetrics : (s.scene.metrics ?? {});
   const html = lesson.metrics
     .map((m) => {
       const raw = vals[m.key];
@@ -404,6 +407,70 @@ function renderMetrics(s: Step): void {
       return [m.key, typeof raw === 'string' ? raw : (raw?.v ?? '—')];
     }),
   );
+}
+
+function paintDynamicControls(): void {
+  if (!lesson) return;
+  const slug = lesson.slug;
+  const host = $('#dynamic-controls');
+  const model = lesson.dynamic;
+  if (!model) {
+    host.innerHTML = '';
+    host.hidden = true;
+    return;
+  }
+  host.hidden = false;
+  const stored = load<Record<string, number>>(`lesson-dynamic:${slug}`, {});
+  dynamicValues = {};
+  for (const parameter of model.parameters) {
+    const raw = stored[parameter.key];
+    dynamicValues[parameter.key] = typeof raw === 'number' && Number.isFinite(raw)
+      ? Math.max(parameter.min, Math.min(parameter.max, raw))
+      : parameter.default;
+  }
+  host.innerHTML = `
+    <div class="dynamic-label"><span>Illustrative scenario</span><button type="button" id="dynamic-reset" title="Reset scenario">${icon('refresh', 12)}</button></div>
+    ${model.parameters.map((p) =>
+      `<label class="dynamic-control" title="${esc(p.description ?? '')}">
+        <span>${esc(p.label)} <b data-value="${p.key}">${esc(String(dynamicValues[p.key]))}${esc(p.unit)}</b></span>
+        <input type="range" data-param="${p.key}" min="${p.min}" max="${p.max}" step="${p.step}" value="${dynamicValues[p.key]}" aria-label="${esc(p.label)}"/>
+      </label>`,
+    ).join('')}`;
+  host.querySelectorAll<HTMLInputElement>('input[type="range"]').forEach((input) => {
+    input.addEventListener('input', () => {
+      const key = input.dataset.param!;
+      const parameter = model.parameters.find((p) => p.key === key)!;
+      const value = Math.max(parameter.min, Math.min(parameter.max, Number(input.value)));
+      dynamicValues = { ...dynamicValues, [key]: value };
+      const output = host.querySelector<HTMLElement>(`[data-value="${key}"]`);
+      if (output) output.textContent = `${value}${parameter.unit}`;
+      save(`lesson-dynamic:${slug}`, dynamicValues);
+      refreshDynamicMetrics();
+    });
+  });
+  $('#dynamic-reset').addEventListener('click', () => {
+    dynamicValues = Object.fromEntries(model.parameters.map((p) => [p.key, p.default]));
+    save(`lesson-dynamic:${slug}`, dynamicValues);
+    paintDynamicControls();
+    refreshDynamicMetrics();
+  });
+  refreshDynamicMetrics();
+}
+
+function refreshDynamicMetrics(): void {
+  if (!lesson) return;
+  const model = lesson.dynamic;
+  if (!model) return;
+  let calculated: Record<string, string | MetricValue>;
+  try {
+    calculated = model.calculate(dynamicValues, stepIdx);
+  } catch (err) {
+    console.error('Dynamic lesson metric calculation failed', { slug: lesson.slug, step: stepIdx + 1, err });
+    return;
+  }
+  const s = lesson.steps[stepIdx]!;
+  currentDynamicMetrics = calculated;
+  renderMetrics(s);
 }
 
 function renderPrintView(): void {
@@ -470,6 +537,7 @@ function showStep(): void {
   if (!lesson || !board) return;
   const s = lesson.steps[stepIdx]!;
   board.render(s.scene);
+  paintDynamicControls();
   renderMetrics(s);
   renderStepCard();
   renderStepper();
@@ -601,6 +669,8 @@ async function route(): Promise<void> {
     lesson = next;
     stepIdx = idx;
     prevMetrics = {};
+    dynamicValues = {};
+    currentDynamicMetrics = {};
     const wasPaused = board?.isPaused ?? false;
     board?.destroy();
     board = new Board($('#board-host'));
