@@ -169,7 +169,7 @@ export const scaling: Sheet = {
   refs: [
     { slug: 'scale-up-out', step: 10, label: 'Up first, then out' },
     { slug: 'load-balancers', step: 11, label: 'What the front door does' },
-    { slug: 'caching', step: 12, label: 'Fast, cheap, and slightly wrong' },
+    { slug: 'caching', step: 11, label: 'Fast, cheap, and slightly wrong' },
     { slug: 'cdn', step: 9, label: 'Move bytes closer' },
   ],
   blocks: [

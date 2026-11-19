@@ -106,7 +106,7 @@ export const CALCS: Record<CalcId, Calc> = {
       return [
         { label: 'Average read latency', value: `${num(h * hitMs + (1 - h) * (hitMs + dbMs), 2)} ms`, strong: true },
         { label: 'Backend reads', value: `${num(rps * (1 - h))} /s` },
-        { label: 'Backend load reduction', value: `${num(h > 0.9999 ? Infinity : 1 / (1 - h), 1)}×` },
+        { label: 'Backend load reduction', value: h > 0.9999 ? 'no backend reads' : `${num(1 / (1 - h), 1)}×` },
       ];
     },
   },

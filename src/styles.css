@@ -279,15 +279,26 @@ mark { background: var(--hl); color: inherit; border-radius: 3px; padding: 0 2px
 .diagram { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 .diag-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 10px 10px 0; position: relative; z-index: 2; }
 .metrics { display: flex; gap: 6px; flex-wrap: wrap; }
+/* sliders get their own row under the metrics, however many a lesson defines */
+.diag-top { flex-wrap: wrap; }
+.metrics { order: 1; flex: 1 1 0; min-width: 0; }
+.diag-ctrl { order: 2; }
 .dynamic-controls {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  flex: 1;
-  min-width: 220px;
-  padding: 0 4px;
+  order: 3;
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  align-items: end;
+  gap: 6px 14px;
+  min-width: 0;
+  padding: 6px 4px 2px;
+  border-top: 1px dashed var(--line-2);
+  margin-top: 2px;
 }
+.dynamic-controls:empty { display: none; }
+.diagram:has(.dynamic-controls:not(:empty)) .board-host { margin-top: 0; }
 .dynamic-label {
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   align-self: stretch;
@@ -310,8 +321,7 @@ mark { background: var(--hl); color: inherit; border-radius: 3px; padding: 0 2px
 .dynamic-control {
   display: grid;
   gap: 2px;
-  flex: 1;
-  min-width: 110px;
+  min-width: 0;
   color: var(--ink-3);
   font-size: 9.5px;
 }
@@ -774,3 +784,84 @@ a.btn-next { color: var(--accent-ink); }
 .l-danger:hover { border-color: var(--bad); color: var(--bad); }
 .l-help { margin: 8px 0 10px; padding-left: 18px; color: var(--ink-2); font-size: 12px; display: grid; gap: 6px; }
 .l-help b { color: var(--ink); }
+
+/* ───────────────────────────── cheatsheets ───────────────────────────── */
+.sh-search { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1.5px solid var(--line-2); border-radius: 10px; background: var(--panel); color: var(--ink-3); }
+.sh-search:focus-within { border-color: var(--ink); }
+.sh-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: 600 12px var(--font); color: var(--ink); }
+.sh-search input::-webkit-search-cancel-button { display: none; }
+.sh-blurb { color: var(--ink-2) !important; font-size: 11.5px !important; line-height: 1.5; }
+.sh-block { padding: 14px 16px; flex: none; scroll-margin-top: 12px; }
+.sh-block h3 { margin: 0 0 10px; font-size: 14px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 7px; }
+.sh-flash { animation: sh-flash 1.6s ease; }
+@keyframes sh-flash { 0%, 60% { box-shadow: 0 0 0 3px var(--accent-2); } 100% { box-shadow: var(--shadow); } }
+.sh-scroll { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
+.sh-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.sh-table th, .sh-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.sh-table thead th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); border-bottom: 1.5px solid var(--line-2); white-space: nowrap; }
+.sh-table tbody th { font-weight: 700; color: var(--ink); white-space: nowrap; }
+.sh-table td { color: var(--ink-2); }
+.sh-table tbody tr:last-child > * { border-bottom: 0; }
+.sh-table tbody tr:hover { background: var(--panel-2); }
+.sh-note { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0 0; padding: 8px 10px; border-radius: 9px; background: var(--good-bg); color: var(--ink); font-size: 12px; }
+.sh-note .ico { margin-top: 2px; color: var(--good); }
+.sh-dl { margin: 0; display: grid; gap: 8px; }
+.sh-dl div { display: grid; grid-template-columns: minmax(110px, 190px) minmax(0, 1fr); gap: 12px; font-size: 12px; }
+.sh-dl dt { font-weight: 800; color: var(--ink); }
+.sh-dl dd { margin: 0; color: var(--ink-2); }
+.sh-formulas { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px; }
+.sh-formula { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); font-size: 12px; }
+.sh-formula small { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); font-weight: 800; }
+.sh-formula code { font: 800 14px var(--font); color: var(--ink); background: none; padding: 0; }
+.sh-formula span { color: var(--ink-2); }
+.sh-steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 12px; color: var(--ink-2); }
+.sh-steps li::marker { font-weight: 800; color: var(--ink); }
+.sh-pitfalls { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 12px; }
+.sh-pitfalls li { display: flex; gap: 8px; align-items: flex-start; color: var(--ink-2); }
+.sh-pitfalls .ico { color: var(--warn); margin-top: 3px; }
+.sh-pit { border-color: var(--yellow-3); }
+.sh-block code, .sh-hits code { font: 600 11.5px var(--font); background: var(--panel-3); padding: 1px 5px; border-radius: 5px; color: var(--ink); }
+.sh-calc-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+:root[data-layout='stack'] .sh-calc-grid { grid-template-columns: minmax(0, 1fr); }
+.sh-inputs { display: grid; gap: 8px; }
+.sh-inputs label { display: grid; gap: 4px; font-size: 11px; font-weight: 700; color: var(--ink-2); }
+.sh-field { display: flex; align-items: center; gap: 6px; }
+.sh-field input { flex: 1; min-width: 0; font: 700 14px var(--font); padding: 7px 10px; border: 1.5px solid var(--line-2); border-radius: 9px; background: var(--panel); color: var(--ink); }
+.sh-field input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 60%, transparent); }
+.sh-field em { font-style: normal; color: var(--ink-3); font-size: 11px; white-space: nowrap; }
+.sh-results { margin: 0; display: grid; gap: 6px; }
+.sh-results div { display: flex; justify-content: space-between; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); font-size: 12px; }
+.sh-results div.strong { background: var(--accent); border-color: var(--accent-2); color: var(--accent-ink); }
+.sh-results dt { color: inherit; opacity: 0.85; }
+.sh-results dd { margin: 0; font-weight: 800; white-space: nowrap; }
+.sh-toc { display: grid; gap: 2px; margin-top: 8px; }
+.sh-toc a { padding: 4px 8px; border-radius: 7px; color: var(--ink-2); text-decoration: none; font-size: 12px; }
+.sh-toc a:hover { background: var(--panel-2); color: var(--ink); }
+.sh-actions { display: grid; gap: 6px; }
+.sh-actions .ghost-btn, #sh-print-all { justify-content: center; width: 100%; }
+.sh-tips { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; font-size: 12px; color: var(--ink-2); }
+.sh-tips li { display: flex; gap: 8px; align-items: flex-start; }
+.sh-tips .ico { margin-top: 2px; color: var(--ink-3); }
+.sh-hits { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.sh-hits a { display: grid; gap: 4px; padding: 10px 12px; text-decoration: none; font-size: 12px; color: var(--ink-2); }
+.sh-hits a:hover { border-color: var(--ink-3); }
+.sh-hits small { color: var(--ink-3); font-weight: 700; display: flex; align-items: center; gap: 5px; }
+.sheets-shell .sh-hits .folder .ico { width: 12px; height: 12px; }
+
+/* printing a cheatsheet: plain black-and-white tables */
+.sh-pblock { break-inside: avoid; margin: 10pt 0; }
+.sh-pblock h3 { font-size: 11pt; margin: 0 0 4pt; border-bottom: 1px solid #000; padding-bottom: 2pt; }
+.print-view .sh-table { font-size: 8.5pt; width: 100%; border-collapse: collapse; }
+.print-view .sh-table th, .print-view .sh-table td { border: 1px solid #999; padding: 2pt 5pt; color: #000; background: none; }
+.print-view .sh-dl div { display: block; font-size: 9pt; margin-bottom: 2pt; }
+.print-view .sh-dl dt, .print-view .sh-dl dd { display: inline; }
+.print-view .sh-dl dt::after { content: ' — '; }
+.print-view .sh-formula { border: 1px solid #999; background: none; padding: 3pt 5pt; margin-bottom: 3pt; }
+.print-view .sh-steps, .print-view .sh-pitfalls { font-size: 9pt; }
+.print-view .sh-pitfalls .ico { display: none; }
+.print-view .sh-pitfalls li::before { content: '☐ '; }
+.print-view .sh-note { background: none; border-left: 3px solid #999; border-radius: 0; font-size: 8.5pt; }
+.print-view .sh-note .ico { display: none; }
+.print-view hr { border: 0; break-after: page; }
+
+.sh-toc a { display: flex; align-items: center; gap: 6px; }
