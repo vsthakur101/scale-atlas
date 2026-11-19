@@ -27,6 +27,103 @@ function formatBytes(n: number): string {
   return `${n} MB`;
 }
 
+type AcademyDomain = 'cache' | 'database' | 'queue' | 'payment' | 'ai' | 'api' | 'security' | 'network' | 'interview' | 'case';
+
+function academyDomain(title: string): AcademyDomain {
+  const s = title.toLowerCase();
+  if (/cache|redis|cdn|memcache|bloom/.test(s)) return 'cache';
+  if (/database|postgres|mysql|sql|dynamodb|spanner|shard|replica|b-tree|lsm|consistency/.test(s)) return 'database';
+  if (/queue|kafka|message|pub.?sub|stream|counter|chat|notification/.test(s)) return 'queue';
+  if (/payment|stripe|paypal|transaction|idempotent|wallet|razorpay|uber payment|apple pay/.test(s)) return 'payment';
+  if (/ai|llm|agent|rag|prompt|vector|fine.?tun|chatgpt|inference|model|genai|claude|notebooklm/.test(s)) return 'ai';
+  if (/api|grpc|graphql|http|websocket|webhook|proxy|gateway|url|rest/.test(s)) return 'api';
+  if (/security|password|oauth|jwt|auth|cyber|firewall|secret|encryption/.test(s)) return 'security';
+  if (/network|dns|tcp|udp|cdn|load balanc|nginx|kubernetes|docker|terraform|vpn|proxy/.test(s)) return 'network';
+  if (/interview|resume|behavioral|framework|cheat sheet/.test(s)) return 'interview';
+  return 'case';
+}
+
+interface TopicNarrative {
+  core: string;
+  mechanism: string;
+  tradeoff: string;
+  caseStudy: string;
+  recap: string;
+}
+
+const academyNarratives: Record<AcademyDomain, TopicNarrative> = {
+  cache: {
+    core: 'A cache is useful only when it removes measured origin work without violating the required freshness boundary.',
+    mechanism: 'Choose cache key, TTL, write policy, miss policy, memory limit, and invalidation owner. Then compare hit ratio, origin load, and stale-read risk.',
+    tradeoff: 'Longer TTL improves hit ratio and speed but may serve old state. Shorter TTL stays fresh but pushes more misses to the origin.',
+    caseStudy: 'A popular key expires and sends a stampede to the database. Coalesce misses, serve a bounded stale copy, or add a refresh lock.',
+    recap: 'Protect the origin, measure hit ratio and tail latency, define staleness, and invalidate or expire every write-sensitive key.',
+  },
+  database: {
+    core: 'Storage choice follows access shape, consistency, write volume, retention, query shape, and recovery requirements.',
+    mechanism: 'Map reads and writes, choose indexes and partition keys, define replication and leader rules, and verify the slowest durable path.',
+    tradeoff: 'Indexes and replicas improve selected operations but increase storage and write cost. Partitioning reduces hot data but complicates cross-partition queries.',
+    caseStudy: 'A leader write succeeds, but a replica read misses it. Define a leader-read rule or expected replication window instead of hiding the inconsistency.',
+    recap: 'State the read/write profile, select a consistency boundary, isolate hot partitions, and test recovery under the real workload.',
+  },
+  queue: {
+    core: 'A queue separates arrival from processing and makes work durable, retryable, and observable.',
+    mechanism: 'Partition work, cap workers, assign idempotency keys, track oldest job age, and route poison jobs to a retry or dead-letter path.',
+    tradeoff: 'Queues absorb bursts but do not create capacity. A growing backlog converts an outage or slow worker pool into delayed user work.',
+    caseStudy: 'The arrival rate exceeds drain rate and the oldest job ages past the deadline. Add capacity or shed work before one partition grows forever.',
+    recap: 'Measure arrival, drain, backlog, age, duplicate rate, and worker saturation; never judge throughput without checking queue state.',
+  },
+  payment: {
+    core: 'Money movement requires durable state, idempotency, reconciliation, auditability, and explicit handling of uncertain outcomes.',
+    mechanism: 'Record intent, authorise, capture or release, reconcile provider state, and expose only terminal results to retrying clients.',
+    tradeoff: 'Stronger reconciliation prevents duplicate effects but adds latency and state. Optimise once an operation becomes externally visible.',
+    caseStudy: 'A response timeout follows a provider-side success. Reconcile before replaying; the local retry must not create a second charge.',
+    recap: 'Model the payment state machine, deduplicate logical operations, reconcile unknown states, and keep a complete audit trail.',
+  },
+  ai: {
+    core: 'AI serving combines model quality, retrieval, preprocessing, inference, guardrails, post-processing, evaluation, and fallback behavior.',
+    mechanism: 'Version prompts and schemas, bound context and retrieval, batch where safe, monitor tail latency and cost, and keep feature values consistent.',
+    tradeoff: 'A larger or fresher model can improve quality while raising latency and cost. Retrieval or guardrails may improve correctness but add network fan-out.',
+    caseStudy: 'Offline quality passes, but a retrieval fan-out or GPU queue breaches p99. Add bounded retrieval, overload protection, or a cached fallback.',
+    recap: 'Test quality and serving together, report cost per request, enforce context limits, and define deterministic degraded behavior.',
+  },
+  api: {
+    core: 'An API is a caller contract that includes data shape, HTTP or RPC semantics, versioning, errors, retries, limits, and observability.',
+    mechanism: 'Minimise round trips, validate at the boundary, paginate stable data, expose machine-readable errors, and make retried writes idempotent.',
+    tradeoff: 'GraphQL or custom endpoints reduce over-fetching but add resolver cost. REST and RPC reduce coupling differently and share no universal winner.',
+    caseStudy: 'A page fans out to many API calls and a timeout causes retries. Bound fan-out, define deadlines, and replay only safe operations.',
+    recap: 'Choose transport from caller behavior, evolve additively, document retry semantics, and measure payload plus p99 end-to-end latency.',
+  },
+  security: {
+    core: 'Security starts with assets, identities, trust boundaries, permissions, encrypted channels, data classification, and recovery behavior.',
+    mechanism: 'Authenticate the subject, authorise the action, validate inputs, encrypt protected data, minimise privilege, and correlate audit records.',
+    tradeoff: 'Every check adds latency and operational state. Strong controls are valuable only when they protect the asset and fail safely.',
+    caseStudy: 'A stolen credential remains valid after revocation. Rotate keys, shorten credential lifetime, validate audience and scope, and alert on anomalies.',
+    recap: 'Minimise trust, assume compromise, enforce least privilege, test revocation, and prepare detection and recovery before launch.',
+  },
+  network: {
+    core: 'A network design moves bytes, connections, and control decisions across delay, loss, routing policy, congestion, and failure domains.',
+    mechanism: 'Reduce hops and connection setup, use the right protocol, retry only retryable work, and keep routing state behind health checks.',
+    tradeoff: 'TCP reliability adds ordering and retransmission cost. UDP removes ordering overhead but leaves delivery semantics to the application.',
+    caseStudy: 'The route or dependency becomes unhealthy. Remove it from health-based routing, preserve in-flight traffic, and keep a bounded retry policy.',
+    recap: 'State RTT and hop count, measure retransmission or congestion, define protocol semantics, and test a regional or link failure.',
+  },
+  interview: {
+    core: 'An interview answer is a constraint-solving exercise: clarify the prompt before naming components.',
+    mechanism: 'List entities and operations, estimate read/write traffic and data, draw the critical path, size bottlenecks, and explain failure recovery.',
+    tradeoff: 'A full architecture is weak if it ignores scale; a pile of estimates is weak if it does not lead to a component choice.',
+    caseStudy: 'The interviewer adds a higher peak or stricter consistency requirement. Re-estimate the bottleneck and change the smallest justified component.',
+    recap: 'Lead with clarifications, give a simple baseline, scale one bottleneck at a time, and close with monitoring and failure scenarios.',
+  },
+  case: {
+    core: 'A production case study starts with the actual workload, requirements, trade-offs, and failure mode.',
+    mechanism: 'Trace one request, locate the bottleneck under peak load, identify the stateful dependency, and explain capacity, replication, or queue decisions.',
+    tradeoff: 'Company choices reflect its constraints and constraints change over time. Transfer a mechanism only when the new workload shares the relevant assumptions.',
+    caseStudy: 'A peak or dependency failure breaches the SLO. Measure queue, cache, database, and network limits before adding another component.',
+    recap: 'State the worked assumptions, explain the critical path, show the scale decision, and name the remaining operational risks.',
+  },
+};
+
 interface ModuleContext {
   tone: Tone;
   level: Level;
@@ -369,15 +466,204 @@ const contexts: Record<string, ModuleContext> = {
 
 export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Lesson {
   const ctx = contexts[module] ?? contexts['How it Works?']!;
-  const parameters: DynamicParameter[] = [
-    { key: 'traffic', label: 'Traffic', min: 100, max: 20_000, step: 100, default: 3_000, unit: 'req/s', description: 'Illustrative incoming request rate.' },
-    { key: 'capacity', label: 'Target capacity', min: 10, max: 95, step: 5, default: 65, unit: '%', description: 'Illustrative usable capacity.' },
-    { key: 'failure', label: 'Failure rate', min: 0, max: 50, step: 1, default: 5, unit: '%', description: 'Illustrative degraded or failed work.' },
-  ];
+  const domain = module.startsWith('academy') ? academyDomain(title) : academyDomain(title);
+  const narrative = academyNarratives[domain];
+  const parametersByDomain: Record<AcademyDomain, DynamicParameter[]> = {
+    cache: [
+      { key: 'traffic', label: 'Read traffic', min: 100, max: 100_000, step: 100, default: 12_000, unit: ' req/s', description: 'Read requests entering the cache tier.' },
+      { key: 'hitRate', label: 'Hit rate', min: 50, max: 99, step: 1, default: 90, unit: '%', description: 'Requests answered by the cache.' },
+      { key: 'originCapacity', label: 'Origin capacity', min: 500, max: 30_000, step: 500, default: 8_000, unit: ' req/s', description: 'Requests the origin can serve.' },
+    ],
+    database: [
+      { key: 'reads', label: 'Read traffic', min: 100, max: 100_000, step: 100, default: 10_000, unit: ' reads/s', description: 'Read operations.' },
+      { key: 'writes', label: 'Write traffic', min: 100, max: 30_000, step: 100, default: 2_000, unit: ' writes/s', description: 'Write operations.' },
+      { key: 'replicas', label: 'Read replicas', min: 1, max: 8, step: 1, default: 3, unit: ' replicas', description: 'Independent read-serving replicas.' },
+    ],
+    queue: [
+      { key: 'arrival', label: 'Arrival rate', min: 100, max: 100_000, step: 100, default: 12_000, unit: ' jobs/s', description: 'Work entering the queue.' },
+      { key: 'drain', label: 'Drain rate', min: 100, max: 100_000, step: 100, default: 10_000, unit: ' jobs/s', description: 'Work completed by workers.' },
+      { key: 'workers', label: 'Workers', min: 1, max: 100, step: 1, default: 20, unit: ' workers', description: 'Concurrent queue consumers.' },
+    ],
+    payment: [
+      { key: 'payments', label: 'Payment traffic', min: 100, max: 50_000, step: 100, default: 5_000, unit: ' tx/s', description: 'Payment operations.' },
+      { key: 'success', label: 'Provider success', min: 50, max: 100, step: 1, default: 98, unit: '%', description: 'Payments that complete successfully.' },
+      { key: 'retry', label: 'Retry share', min: 0, max: 30, step: 1, default: 5, unit: '%', description: 'Requests retried after timeout or uncertainty.' },
+    ],
+    ai: [
+      { key: 'requests', label: 'Inference rate', min: 10, max: 20_000, step: 10, default: 500, unit: ' req/s', description: 'Model inference requests.' },
+      { key: 'tokens', label: 'Output tokens', min: 10, max: 4_000, step: 10, default: 500, unit: ' tokens', description: 'Generated tokens per response.' },
+      { key: 'gpuCapacity', label: 'GPU capacity', min: 1, max: 128, step: 1, default: 8, unit: ' GPUs', description: 'Available serving accelerators.' },
+    ],
+    api: [
+      { key: 'rps', label: 'Request rate', min: 100, max: 100_000, step: 100, default: 8_000, unit: ' req/s', description: 'Requests reaching the API.' },
+      { key: 'latency', label: 'Dependency p99', min: 10, max: 2_000, step: 10, default: 80, unit: ' ms', description: 'Slow dependency percentile.' },
+      { key: 'payload', label: 'Payload size', min: 1, max: 5_000, step: 1, default: 100, unit: ' KB', description: 'Response payload per request.' },
+    ],
+    security: [
+      { key: 'requests', label: 'Auth rate', min: 100, max: 100_000, step: 100, default: 5_000, unit: ' req/s', description: 'Requests requiring policy checks.' },
+      { key: 'controls', label: 'Security checks', min: 1, max: 12, step: 1, default: 4, unit: ' checks', description: 'Identity, policy, and validation stages.' },
+      { key: 'revocation', label: 'Revocation p99', min: 10, max: 2_000, step: 10, default: 100, unit: ' ms', description: 'Time to reflect credential revocation.' },
+    ],
+    network: [
+      { key: 'traffic', label: 'Network traffic', min: 100, max: 100_000, step: 100, default: 10_000, unit: ' req/s', description: 'Requests or connections entering the path.' },
+      { key: 'hops', label: 'Network hops', min: 1, max: 20, step: 1, default: 5, unit: ' hops', description: 'Service and network boundaries crossed.' },
+      { key: 'rtt', label: 'One-hop RTT', min: 1, max: 500, step: 1, default: 20, unit: ' ms', description: 'Round-trip time per network hop.' },
+    ],
+    interview: [
+      { key: 'users', label: 'Daily users', min: 1_000, max: 1_000_000_000, step: 1_000, default: 10_000_000, unit: ' users', description: 'Users in the design.' },
+      { key: 'readWrite', label: 'Read share', min: 10, max: 95, step: 5, default: 80, unit: '% reads', description: 'Share of traffic that is reads.' },
+      { key: 'p99Target', label: 'p99 target', min: 50, max: 2_000, step: 50, default: 300, unit: ' ms', description: 'Latency target for the design.' },
+    ],
+    case: [
+      { key: 'traffic', label: 'Peak traffic', min: 100, max: 100_000, step: 100, default: 20_000, unit: ' req/s', description: 'Illustrative peak workload.' },
+      { key: 'capacity', label: 'System capacity', min: 10, max: 95, step: 5, default: 65, unit: '%', description: 'Usable peak capacity.' },
+      { key: 'failure', label: 'Failure rate', min: 0, max: 40, step: 1, default: 5, unit: '%', description: 'Requests affected by a degraded dependency.' },
+    ],
+  };
+  const parameters = parametersByDomain[domain];
   const stepMetrics = (
     input: Record<string, number>,
     stepIndex: number,
   ): Record<string, string | MetricValue> => {
+    if (domain === 'cache') {
+      const traffic = input.traffic ?? 12_000;
+      const hitRate = input.hitRate ?? 90;
+      const originCapacity = input.originCapacity ?? 8_000;
+      const missRate = 1 - hitRate / 100;
+      const originLoad = traffic * missRate;
+      const rho = originLoad / originCapacity;
+      const p99 = Math.round(12 + (rho > 1 ? 600 : rho * 180));
+      return {
+        hit: { v: `${hitRate}%`, tone: hitRate >= 90 ? 'good' : hitRate >= 70 ? 'warn' : 'bad' },
+        latency: { v: `${hitRate >= 90 ? 8 : 18} ms hit`, tone: hitRate >= 90 ? 'good' : 'warn' },
+        stale: { v: stepIndex === 4 ? 'unknown' : 'TTL bounded', tone: stepIndex === 4 ? 'bad' : 'warn' },
+        load: { v: `${Math.round(originLoad).toLocaleString()}/s`, tone: rho > 1 ? 'bad' : rho > 0.8 ? 'warn' : 'good' },
+        p99: { v: `${p99} ms`, tone: p99 > 250 ? 'bad' : p99 > 80 ? 'warn' : 'good' },
+      };
+    }
+    if (domain === 'database') {
+      const reads = input.reads ?? 10_000;
+      const writes = input.writes ?? 2_000;
+      const replicas = input.replicas ?? 3;
+      const readPerReplica = reads / replicas;
+      const writeCost = (writes * 2) / 5000;
+      const lag = Math.max(5, Math.round(120 * writeCost * (stepIndex === 4 ? 2 : 1)));
+      return {
+        reads: { v: `${reads.toLocaleString()}/s`, tone: readPerReplica > 5_000 ? 'bad' : 'good' },
+        writes: { v: `${writes.toLocaleString()}/s`, tone: writes > 5_000 ? 'warn' : undefined },
+        lag: { v: `${lag} ms`, tone: lag > 250 ? 'bad' : lag > 100 ? 'warn' : 'good' },
+        durability: { v: `${replicas + 1} copies`, tone: replicas >= 2 ? 'good' : 'warn' },
+      };
+    }
+    if (domain === 'queue') {
+      const arrival = input.arrival ?? 12_000;
+      const drain = input.drain ?? 10_000;
+      const workers = input.workers ?? 20;
+      const backlog = Math.max(0, Math.round(arrival - drain));
+      const perWorker = drain / workers;
+      const age = Math.round(backlog / Math.max(1, drain) * 1000);
+      return {
+        qps: { v: `${arrival.toLocaleString()}/s`, tone: undefined },
+        lag: { v: `${age} ms`, tone: age > 500 ? 'bad' : age > 150 ? 'warn' : 'good' },
+        capacity: { v: `${Math.round(perWorker).toLocaleString()} jobs/wkr/s`, tone: perWorker > 2_000 ? 'warn' : 'good' },
+        risk: { v: backlog ? `${backlog.toLocaleString()}/s backlog` : '0 backlog', tone: backlog > 0 ? 'bad' : 'good' },
+      };
+    }
+    if (domain === 'payment') {
+      const payments = input.payments ?? 5_000;
+      const success = input.success ?? 98;
+      const retry = input.retry ?? 5;
+      const successful = Math.round(payments * success / 100);
+      const retries = Math.round(payments * retry / 100);
+      const duplicateRisk = retries * (100 - success) / 100;
+      return {
+        risk: { v: `${Math.round(duplicateRisk)} duplicate candidates`, tone: duplicateRisk > 20 ? 'bad' : duplicateRisk > 5 ? 'warn' : 'good' },
+        p99: { v: `${Math.round(80 + retry * 9)} ms`, tone: retry > 15 ? 'bad' : retry > 8 ? 'warn' : 'good' },
+        dupes: { v: `${retries}/s retries`, tone: retries > 200 ? 'bad' : retries > 50 ? 'warn' : 'good' },
+        audit: { v: `${successful.toLocaleString()}/s reconciled`, tone: success >= 98 ? 'good' : 'warn' },
+      };
+    }
+    if (domain === 'ai') {
+      const requests = input.requests ?? 500;
+      const tokens = input.tokens ?? 500;
+      const gpus = input.gpuCapacity ?? 8;
+      const throughputPerGpu = 70;
+      const utilization = requests / (gpus * throughputPerGpu);
+      const p99 = Math.round(120 + tokens * 0.35 + utilization * 900);
+      const cost = requests * tokens * 0.00000015 * gpus;
+      return {
+        quality: { v: `${Math.max(70, 98 - Math.round(utilization * 10))}% target`, tone: utilization > 0.85 ? 'warn' : 'good' },
+        latency: { v: `${p99} ms`, tone: p99 > 1_000 ? 'bad' : p99 > 400 ? 'warn' : 'good' },
+        cost: { v: `$${cost.toFixed(3)}/s`, tone: utilization > 0.9 ? 'warn' : undefined },
+        fallback: { v: utilization > 0.97 ? 'warm fallback' : `${gpus} GPUs active`, tone: utilization > 0.97 ? 'bad' : 'good' },
+      };
+    }
+    if (domain === 'api') {
+      const rps = input.rps ?? 8_000;
+      const dependencyP99 = input.latency ?? 80;
+      const payload = input.payload ?? 100;
+      const fanout = stepIndex >= 4 ? 8 : 3;
+      const pageP99 = Math.round(dependencyP99 * (1 + Math.log2(fanout)));
+      return {
+        calls: { v: `${fanout} calls/page`, tone: fanout > 5 ? 'warn' : 'good' },
+        payload: { v: `${payload} KB`, tone: payload > 1_000 ? 'bad' : payload > 500 ? 'warn' : 'good' },
+        latency: { v: `${pageP99} ms p99`, tone: pageP99 > 500 ? 'bad' : pageP99 > 200 ? 'warn' : 'good' },
+        safe: { v: stepIndex >= 5 ? 'retry contract set' : `${rps.toLocaleString()} req/s`, tone: stepIndex >= 5 ? 'good' : undefined },
+      };
+    }
+    if (domain === 'security') {
+      const requests = input.requests ?? 5_000;
+      const controls = input.controls ?? 4;
+      const revocationP99 = input.revocation ?? 100;
+      const checkLoad = requests * controls;
+      const p99 = Math.round(revocationP99 + controls * 4);
+      return {
+        trust: { v: `${controls} boundaries`, tone: controls > 8 ? 'warn' : 'good' },
+        latency: { v: `${p99} ms`, tone: p99 > 500 ? 'bad' : p99 > 150 ? 'warn' : 'good' },
+        access: { v: `${checkLoad.toLocaleString()} checks/s`, tone: checkLoad > 40_000 ? 'warn' : 'good' },
+        detect: { v: revocationP99 < 250 ? 'fast revoke' : 'slow revoke', tone: revocationP99 < 250 ? 'good' : 'bad' },
+      };
+    }
+    if (domain === 'network') {
+      const traffic = input.traffic ?? 10_000;
+      const hops = input.hops ?? 5;
+      const rtt = input.rtt ?? 20;
+      const p99 = hops * rtt * (stepIndex >= 4 ? 1.8 : 1);
+      return {
+        qps: { v: `${traffic.toLocaleString()}/s`, tone: traffic > 50_000 ? 'warn' : undefined },
+        lag: { v: `${p99} ms`, tone: p99 > 250 ? 'bad' : p99 > 150 ? 'warn' : 'good' },
+        zone: { v: `${hops} hops`, tone: hops > 10 ? 'warn' : 'good' },
+        spof: { v: stepIndex >= 5 ? 'route redundant' : `${Math.max(1, hops - 3)} hop risks`, tone: stepIndex >= 5 ? 'good' : 'warn' },
+      };
+    }
+    if (domain === 'interview') {
+      const users = input.users ?? 10_000_000;
+      const readShare = input.readWrite ?? 80;
+      const target = input.p99Target ?? 300;
+      const qps = Math.round(users * (readShare / 100) / 86400);
+      const dataPerDay = Math.round(users * 0.01);
+      return {
+        qps: { v: `${qps.toLocaleString()}/s`, tone: qps > 100_000 ? 'warn' : 'good' },
+        data: { v: formatBytes(dataPerDay), tone: undefined },
+        p99: { v: `${target} ms target`, tone: target <= 300 ? 'good' : target <= 600 ? 'warn' : 'bad' },
+        trade: { v: `${stepIndex >= 4 ? 5 : 3} decisions`, tone: 'warn' },
+      };
+    }
+    if (domain === 'case') {
+      const traffic = input.traffic ?? 20_000;
+      const capacity = input.capacity ?? 65;
+      const failure = input.failure ?? 5;
+      const effectiveCapacity = traffic * (capacity / 100);
+      const offeredAfterFailure = traffic * (1 + failure / 100);
+      const saturation = offeredAfterFailure / Math.max(1, effectiveCapacity);
+      const p99 = Math.round(80 * (saturation >= 1 ? 8 : 1 + saturation * 2) * (stepIndex >= 4 ? 1.5 : 1));
+      return {
+        traffic: { v: `${traffic.toLocaleString()}/s`, tone: traffic > 50_000 ? 'warn' : undefined },
+        p99: { v: `${p99} ms`, tone: p99 > 500 ? 'bad' : p99 > 180 ? 'warn' : 'good' },
+        capacity: { v: `${capacity}% usable`, tone: capacity < 50 ? 'bad' : capacity < 65 ? 'warn' : 'good' },
+        risk: { v: `${failure}% failure`, tone: failure >= 20 ? 'bad' : failure >= 8 ? 'warn' : 'good' },
+      };
+    }
     const traffic = input.traffic ?? 3_000;
     const capacity = input.capacity ?? 65;
     const failure = input.failure ?? 5;
@@ -489,8 +775,8 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
       kind: 'problem',
       title: `${title}: why it matters`,
       body: [
-        `A team encounters <b>${title}</b> while operating a real system. The first problem is not choosing a tool; it is defining the user outcome, constraint, and failure mode that the topic has to handle.`,
-        ctx.core,
+        `For <b>${title}</b>, begin with the user-visible outcome and the constraint that makes this topic necessary.`,
+        narrative.core,
       ],
       concepts: [{ term: title, def: `A system-design topic that describes one constraint, mechanism, or trade-off relevant to ${module}.` }],
       scene: {
@@ -504,8 +790,8 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
       kind: 'technique',
       title: 'Separate the mechanism from the implementation',
       body: [
-        ctx.core,
-        ctx.mechanism,
+        narrative.core,
+        narrative.mechanism,
       ],
       concepts: [{ term: 'Mechanism', def: 'The specific state, control-flow, or data-movement rule that provides the desired system behavior.' }],
       scene: {
@@ -519,8 +805,8 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
       kind: 'insight',
       title: 'Trace the normal path',
       body: [
-        `The normal path for <b>${title}</b> begins with one request, carries state across a boundary, and ends in a returned result or durable side effect.`,
-        'Document capacity and latency at every stage; a successful component-level check is not sufficient if the end-to-end requirement is exceeded.',
+        `Trace <b>${title}</b> as a sequence of inputs, decisions, state changes, and outputs. Name the resource or invariant that this mechanism protects.`,
+        narrative.mechanism,
       ],
       concepts: [{ term: 'Critical path', def: 'The sequence of operations and dependencies that determines whether the end-to-end result completes within budget.' }],
       scene: {
@@ -534,8 +820,8 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
       kind: 'tradeoff',
       title: 'Every benefit consumes another resource',
       body: [
-        ctx.tradeoff,
-        'Use a simple baseline before introducing the advanced form of the technique. Add complexity only when a measured bottleneck or explicit requirement proves it necessary.',
+        narrative.tradeoff,
+        'Use a simple baseline before introducing the advanced form. Add complexity only when a measured bottleneck or explicit requirement proves it necessary.',
       ],
       note: { kind: 'warn', text: 'Avoid adopting a pattern because it appears common. Adopt it because the system’s requirements and failure model require it.' },
       concepts: [{ term: 'Trade-off', def: 'A design choice that improves one property while increasing cost or reducing another property.' }],
@@ -550,8 +836,8 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
       kind: 'case',
       title: 'Test the failure boundary',
       body: [
-        ctx.caseStudy,
-        'The design should name the retry limit, timeout, fallback, recovery owner, and signal that tells operators the condition is worsening.',
+        narrative.caseStudy,
+        'Define the timeout, retry limit, fallback owner, and signal that tells operators the condition is worsening.',
       ],
       changes: [{ text: 'Timeout or degraded dependency', tone: 'bad' }, { text: 'Fallback with bounded recovery', tone: 'good' }],
       concepts: [{ term: 'Fallback', def: 'A bounded alternative behavior used when the preferred path cannot meet its requirement.' }],
@@ -566,8 +852,8 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
       kind: 'recap',
       title: `${title}: the design summary`,
       body: [
-        ctx.recap,
-        `For <b>${title}</b>, verify the outcome under normal load, partial failure, and recovery. Keep the metrics, ownership, and runbook connected to the architecture rather than letting them live in separate documents.`,
+        narrative.recap,
+        `For <b>${title}</b>, verify the outcome under normal load, partial failure, and recovery. Keep the formula, metric, owner, and runbook attached to the same architecture decision.`,
       ],
       note: { kind: 'key', text: 'A strong answer explains both how the mechanism works and why it is appropriate for the stated constraints.' },
       scene: {

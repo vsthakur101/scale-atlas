@@ -35,8 +35,11 @@ hand-authored lessons. No upstream prose, diagrams, or assets are copied.
 The catalog also merges 211 unique titles from the public System Design Academy
 index into five modules: System Design Case Study, System Design Fundamentals,
 System Design Interview, AI Engineering, and Software White Papers. Academy
-entries use original, section-aware overview lessons and dynamic fallback
-parameters. They are not copies of upstream article text or visuals.
+entries use original domain-specific lesson narratives and real calculated
+metric models. The McDonald’s food delivery lesson is one fully bespoke case
+study, while the remaining Academy entries use reusable cache, database,
+queue, payment, AI, API, security, network, interview, and case-study adapters.
+They are not copies of upstream article text or visuals.
 
 ## Practice
 
