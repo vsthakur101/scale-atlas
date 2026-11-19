@@ -51,10 +51,10 @@ export const MODULES: ModuleDef[] = [
     title: 'Communication',
     tone: 'orange',
     lessons: [
-      { slug: 'api-styles', title: 'API Styles' },
-      { slug: 'queues', title: 'Queues' },
-      { slug: 'pubsub', title: 'Events & Pub/Sub' },
-      { slug: 'push', title: 'Push: Polling to WebSockets' },
+      { slug: 'api-styles', title: 'API Styles', load: () => import('./lessons/api-styles') },
+      { slug: 'queues', title: 'Queues', load: () => import('./lessons/queues') },
+      { slug: 'pubsub', title: 'Events & Pub/Sub', load: () => import('./lessons/pubsub') },
+      { slug: 'push', title: 'Push: Polling to WebSockets', load: () => import('./lessons/push') },
     ],
   },
   {
