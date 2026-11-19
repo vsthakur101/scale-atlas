@@ -26,7 +26,17 @@ npm run build      # typecheck + production bundle in dist/
 
 All 40 lessons (380 steps, 298 searchable concepts) are written.
 
-Shell features: course tree with per-module progress, lesson stepper, keyboard nav (`←` `→` `R` `Space` `/` `⌘K`), swipe on touch, search palette over concepts and steps, light/dark theme with no flash, three layouts (desktop / tablet drawer / stacked phone), read-aloud, copy step link, print-a-lesson view, reduced-motion support. Practice / Design Lab / Cheatsheets tabs and the language menu are placeholders.
+## Practice
+
+The Practice tab (`#/practice`) has 52 drills — one set per module plus a weighted mixed review:
+
+- **Spot it**: a live diagram with symptoms; click the component that answers the prompt (or pick from the list).
+- **Choose**: one correct option; every option explains why it is right or wrong after answering.
+- **Estimate**: napkin maths graded by ratio — within 2× is right, within 10× is close. Accepts `4,096,000`, `4.1M`, `2k`, `1e6`.
+
+Every drill links back to the lesson step that teaches it. History (per-drill last result, streak) is kept in `localStorage` under `atlas:practice*`; mixed review favours drills you missed or haven't tried. Code lives in `src/practice/` (`drills-core.ts`, `drills-advanced.ts` for content; `view.ts` for the UI).
+
+Shell features: course tree with per-module progress, lesson stepper, keyboard nav (`←` `→` `R` `Space` `/` `⌘K`), swipe on touch, search palette over concepts and steps, light/dark theme with no flash, three layouts (desktop / tablet drawer / stacked phone), read-aloud, copy step link, print-a-lesson view, reduced-motion support. Design Lab / Cheatsheets tabs and the language menu are placeholders.
 
 ## Layout
 
@@ -38,6 +48,7 @@ src/
   course/catalog.ts       module/lesson map; a lesson with `load` is written
   course/kit.ts           authoring helpers (at, box, db, crowd, link, flow, pill, patch)
   course/lessons/*.ts     one file per lesson, code-split
+  practice/               drill sets, grading, progress and the Practice view (lazy-loaded)
   ui/search.ts, toast.ts  palette + toasts
   store.ts                localStorage (prefix `atlas:`), guarded
   site.ts                 name / author branding
