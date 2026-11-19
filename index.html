@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Scale Atlas — system design you can watch</title>
+    <meta
+      name="description"
+      content="An interactive system design course. Every concept is an animated isometric diagram you step through: from one server to a fleet serving millions."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#f3eadf" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Resolve theme + layout before first paint so the shell never flashes.
+      try {
+        var t = JSON.parse(localStorage.getItem('atlas:theme') || 'null');
+        if (t === 'dark' || (t === null && matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch (e) {}
+      (function () {
+        var w = innerWidth, h = innerHeight;
+        document.documentElement.dataset.layout =
+          w >= 1200 && h >= 560 ? 'desktop' : w >= 960 && h >= 600 ? 'tablet' : 'stack';
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>
+      <p style="max-width: 520px; margin: 15vh auto; font: 15px/1.5 ui-monospace, monospace">
+        Scale Atlas is an interactive course built from animated diagrams. It needs JavaScript.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
