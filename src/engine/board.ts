@@ -17,20 +17,21 @@ const LINK_LIFT = 8;
 const PACKET_SPEED = 210; // px / s
 
 type Pt = { x: number; y: number };
+type ViewBox = { x: number; y: number; w: number; h: number };
 
 export const proj = (gx: number, gy: number): Pt => ({ x: (gx - gy) * C * S, y: (gx + gy) * 0.5 * S });
 
 const DEFAULT_SIZE: Record<SceneNode['kind'], [number, number]> = {
-  block: [2, 2],
-  db: [2, 2],
-  crowd: [3, 2.4],
-  device: [2.4, 2.4],
+  block: [1.7, 1.7],
+  db: [1.5, 1.5],
+  crowd: [2.8, 2.2],
+  device: [2.3, 2.3],
   zone: [6, 6],
   disk: [1.6, 1.6],
 };
 const DEFAULT_HEIGHT: Record<SceneNode['kind'], number> = {
-  block: 54,
-  db: 58,
+  block: 50,
+  db: 54,
   crowd: 10,
   device: 14,
   zone: 0,
@@ -184,8 +185,7 @@ function zoneShape(n: SceneNode): string {
   const [b, r, f, l] = corners(w, d);
   let s = `<polygon class="zone-fill" points="${pts(b, r, f, l)}"/>`;
   if (n.name) {
-    const p = proj(-w / 2 + 0.4, d / 2 - 0.4);
-    s += `<text class="zone-name" x="${p.x.toFixed(1)}" y="${(p.y + 4).toFixed(1)}" text-anchor="start">${esc(n.name)}</text>`;
+    s += `<text class="zone-name" x="${b.x.toFixed(1)}" y="${(b.y + 26).toFixed(1)}" text-anchor="middle">${esc(n.name)}</text>`;
   }
   return s;
 }
@@ -320,6 +320,7 @@ export class Board {
   private zones: SVGGElement;
   private links: SVGGElement;
   private packets: SVGGElement;
+  private linkLabels: SVGGElement;
   private nodes: SVGGElement;
   private pills: SVGGElement;
   private scene: Scene | null = null;
@@ -329,8 +330,8 @@ export class Board {
   private raf = 0;
   private last = 0;
   private paused = false;
-  private vb = { x: -400, y: -260, w: 800, h: 520 };
-  private vbTween: { from: typeof this.vb; to: typeof this.vb; start: number } | null = null;
+  private vb: ViewBox = { x: -400, y: -260, w: 800, h: 520 };
+  private vbTween: { from: ViewBox; to: ViewBox; start: number } | null = null;
   private reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   constructor(host: HTMLElement) {
@@ -355,6 +356,7 @@ export class Board {
     this.links = layer('l-links');
     this.packets = layer('l-packets');
     this.nodes = layer('l-nodes');
+    this.linkLabels = layer('l-linklabels');
     this.pills = layer('l-pills');
     host.appendChild(this.svg);
     this.applyViewBox(this.vb);
@@ -466,6 +468,7 @@ export class Board {
 
   private renderLinks(links: SceneLink[], byId: Map<string, SceneNode>): void {
     let s = '';
+    let labels = '';
     for (const l of links) {
       const a = byId.get(l.from);
       const b = byId.get(l.to);
@@ -490,14 +493,17 @@ export class Board {
         const my = (y1 + y2) / 2;
         s += `<g class="link-break" transform="translate(${mx.toFixed(1)} ${my.toFixed(1)})"><circle r="9"/><path d="M-3.5,-3.5 L3.5,3.5 M3.5,-3.5 L-3.5,3.5"/></g>`;
       }
-      if (l.label) s += pillMarkup(l.label, (x1 + x2) / 2, (y1 + y2) / 2 + (l.style === 'broken' ? 24 : 0));
+      if (l.label) labels += pillMarkup(l.label, (x1 + x2) / 2, (y1 + y2) / 2 + (l.style === 'broken' ? 24 : 0));
     }
-    if (this.links.dataset.sig !== s) {
+    if (this.links.dataset.sig !== s + labels) {
       this.links.innerHTML = s;
-      this.links.dataset.sig = s;
-      this.links.classList.remove('fade-in');
-      this.links.getBoundingClientRect();
-      this.links.classList.add('fade-in');
+      this.linkLabels.innerHTML = labels;
+      this.links.dataset.sig = s + labels;
+      for (const g of [this.links, this.linkLabels]) {
+        g.classList.remove('fade-in');
+        g.getBoundingClientRect();
+        g.classList.add('fade-in');
+      }
     }
   }
 
