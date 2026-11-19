@@ -108,4 +108,14 @@ export const PUBLISHED: ReadonlySet<string> = new Set([
   'academy-this-is-how-stripe-does-rate-limiting-to-build-scalable-apis',
   'source-swift-payment-messaging-system',
   'academy-prompt-engineering-a-deep-dive',
+  // batch 12
+  'source-why-is-kafka-fast',
+  'source-how-do-sql-joins-work',
+  'source-sql-statement-execution-in-database',
+  'source-orchestration-vs-choreography-in-microservices',
+  'source-4-ways-netflix-uses-caching',
+  'source-how-does-javascript-work',
+  'source-change-data-capture-key-to-leverage-real-time-data',
+  'source-pessimistic-vs-optimistic-locking',
+  'source-cloud-cost-reduction-techniques',
 ]);
