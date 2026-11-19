@@ -88,4 +88,14 @@ export const PUBLISHED: ReadonlySet<string> = new Set([
   'academy-mcp-a-deep-dive',
   'academy-how-fine-tuning-works',
   'academy-multi-agent-architectures-clearly-explained',
+  // batch 10
+  'academy-how-gitops-works',
+  'source-unified-payments-interface-upi',
+  'source-how-ach-payment-works',
+  'academy-8-reasons-why-whatsapp-was-able-to-support-50-billion-messages-a-day-with-only-32-engineers',
+  'academy-how-netflix-uses-chaos-engineering-to-create-resilience-systems',
+  'source-what-is-the-journey-of-a-slack-message',
+  'academy-5-reasons-why-zoom-was-able-to-support-300-million-video-calls-a-day',
+  'academy-how-uber-computes-eta-at-half-a-million-requests-per-second',
+  'academy-what-is-context-engineering',
 ]);
