@@ -248,7 +248,7 @@ function renderTree(): void {
   $('#progress-card').innerHTML = `
     <div class="pc-row"><span>Progress</span><b>${finished} / ${total}</b></div>
     <div class="bar"><i style="width:${(finished / total) * 100}%"></i></div>
-    ${finished ? `<button class="link-btn" id="reset-btn">Reset progress</button>` : `<small>${BUILT_LESSONS.length} lessons ready · more coming</small>`}`;
+    ${finished ? `<button class="link-btn" id="reset-btn">Reset progress</button>` : `<small>${BUILT_LESSONS.length === total ? `${total} lessons · start anywhere` : `${BUILT_LESSONS.length} lessons ready · more coming`}</small>`}`;
   document.getElementById('reset-btn')?.addEventListener('click', () => {
     if (confirm('Clear your progress on every lesson?')) resetProgress();
   });

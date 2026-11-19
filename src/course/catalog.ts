@@ -103,10 +103,10 @@ export const MODULES: ModuleDef[] = [
     title: 'Case Studies',
     tone: 'grey',
     lessons: [
-      { slug: 'requirements', title: 'From Requirements to Design' },
-      { slug: 'link-shortener', title: 'A Link Shortener' },
-      { slug: 'social-feed', title: 'A Social Feed' },
-      { slug: 'messaging', title: 'A Messaging App' },
+      { slug: 'requirements', title: 'From Requirements to Design', load: () => import('./lessons/requirements') },
+      { slug: 'link-shortener', title: 'A Link Shortener', load: () => import('./lessons/link-shortener') },
+      { slug: 'social-feed', title: 'A Social Feed', load: () => import('./lessons/social-feed') },
+      { slug: 'messaging', title: 'A Messaging App', load: () => import('./lessons/messaging') },
     ],
   },
 ];
