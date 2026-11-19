@@ -2,7 +2,7 @@ import type { IconName } from './engine/icons';
 
 export type Tone = 'sand' | 'blue' | 'orange' | 'green' | 'purple' | 'red' | 'teal' | 'grey' | 'yellow';
 
-export type NodeKind = 'block' | 'db' | 'crowd' | 'device' | 'zone' | 'disk';
+export type NodeKind = 'block' | 'db' | 'crowd' | 'device' | 'zone' | 'disk' | 'ring';
 
 export type PillTone = 'default' | 'good' | 'bad' | 'warn' | 'accent';
 

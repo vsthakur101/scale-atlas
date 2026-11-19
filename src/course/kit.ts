@@ -84,3 +84,22 @@ export const link = (from: string, to: string, extra: Partial<SceneLink> = {}): 
 export const flow = (route: string[], extra: Partial<SceneFlow> = {}): SceneFlow => ({ route, ...extra });
 
 export const pill = (text: string, ico?: IconName, tone?: Pill['tone']): Pill => ({ text, icon: ico, tone });
+
+/**
+ * Grid position on a ground-plane circle around `center` (grid coords). `deg` is a
+ * screen angle: 0 = top of the screen, increasing clockwise.
+ */
+export function onRing(center: [number, number], radius: number, deg: number): [number, number] {
+  const t = ((225 + deg) * Math.PI) / 180;
+  return [center[0] + radius * Math.cos(t), center[1] + radius * Math.sin(t)];
+}
+
+export const ring = (id: string, r: number, d: number, radius: number, name?: string, extra: Extra = {}): SceneNode => ({
+  id,
+  kind: 'ring',
+  at: at(r, d),
+  size: [radius, radius],
+  name,
+  tone: 'sand',
+  ...extra,
+});

@@ -529,3 +529,6 @@ mark { background: var(--hl); color: inherit; border-radius: 3px; padding: 0 2px
 :root[data-layout='stack'] .metric { min-width: 84px; flex: none; }
 :root[data-layout='stack'] .diag-ctrl { margin-left: auto; }
 :root[data-layout='stack'] .board-host { margin-top: 0; }
+
+.ring-fill { fill: var(--t1); fill-opacity: 0.25; stroke: none !important; }
+.ring-line { fill: none; stroke: var(--ink-2) !important; stroke-width: 2.4 !important; stroke-dasharray: 2 7; stroke-linecap: round; }

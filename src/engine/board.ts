@@ -28,6 +28,7 @@ const DEFAULT_SIZE: Record<SceneNode['kind'], [number, number]> = {
   device: [2.3, 2.3],
   zone: [6, 6],
   disk: [1.6, 1.6],
+  ring: [4, 4],
 };
 const DEFAULT_HEIGHT: Record<SceneNode['kind'], number> = {
   block: 50,
@@ -36,6 +37,7 @@ const DEFAULT_HEIGHT: Record<SceneNode['kind'], number> = {
   device: 14,
   zone: 0,
   disk: 22,
+  ring: 0,
 };
 
 const sizeOf = (n: SceneNode): [number, number] => n.size ?? DEFAULT_SIZE[n.kind];
@@ -190,8 +192,22 @@ function zoneShape(n: SceneNode): string {
   return s;
 }
 
+/** A circle on the ground plane (radius = size[0] grid units), e.g. a hash ring. */
+function ringShape(n: SceneNode): string {
+  const [rad] = sizeOf(n);
+  const rx = Math.SQRT2 * C * S * rad;
+  const ry = Math.SQRT2 * 0.5 * S * rad;
+  let s = `<ellipse class="ring-fill" cx="0" cy="0" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}"/>`;
+  s += `<ellipse class="ring-line" cx="0" cy="0" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}"/>`;
+  if (n.name) s += `<text class="zone-name" x="0" y="4" text-anchor="middle">${esc(n.name)}</text>`;
+  if (n.sub) s += `<text class="n-sub" x="0" y="20">${esc(n.sub)}</text>`;
+  return s;
+}
+
 function shapeFor(n: SceneNode): string {
   switch (n.kind) {
+    case 'ring':
+      return ringShape(n);
     case 'block':
       return blockShape(n);
     case 'db':
@@ -249,6 +265,7 @@ function loadMarkup(load: number, cx: number, cy: number): string {
 
 function pillsFor(n: SceneNode): string {
   if (n.kind === 'zone') return '';
+  if (n.kind === 'ring') return n.tag ? pillMarkup(n.tag, 0, -Math.SQRT2 * 0.5 * S * sizeOf(n)[0] - 26) : '';
   const [w, d] = sizeOf(n);
   const h = heightOf(n);
   const halfDown = ((w + d) / 2) * 0.5 * S;
@@ -399,7 +416,7 @@ export class Board {
     for (const n of scene.nodes) {
       keep.add(n.id);
       const p = proj(n.at[0], n.at[1]);
-      const layer = n.kind === 'zone' ? this.zones : this.nodes;
+      const layer = n.kind === 'zone' || n.kind === 'ring' ? this.zones : this.nodes;
       let g = layer.querySelector<SVGGElement>(`:scope > g[data-id="${CSS.escape(n.id)}"]`);
       const fresh = !g;
       if (!g) {
@@ -610,8 +627,9 @@ export class Board {
       const p = proj(n.at[0], n.at[1]);
       const [w, d] = sizeOf(n);
       const h = heightOf(n);
-      const half = ((w + d) / 2) * C * S;
-      const halfDown = ((w + d) / 2) * 0.5 * S;
+      const ringK = n.kind === 'ring' ? Math.SQRT2 : 1;
+      const half = ((w + d) / 2) * C * S * ringK;
+      const halfDown = ((w + d) / 2) * 0.5 * S * ringK;
       let top = p.y - h - halfDown - 20;
       if (n.tag) top -= 30;
       if (n.load !== undefined) top -= 28;

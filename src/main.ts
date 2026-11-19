@@ -270,7 +270,17 @@ function renderLessonHead(): void {
       </div>
     </div>
     <p class="blurb">${esc(lesson.blurb)}</p>`;
-  $('#legend').innerHTML = lesson.legend
+  // derive the legend from the packets the lesson actually animates, so it can't drift
+  const used = new Set<FlowKind>(lesson.legend);
+  for (const s of lesson.steps) {
+    for (const f of s.scene.flows ?? []) {
+      used.add(f.kind ?? 'request');
+      if (f.back) used.add('response');
+    }
+  }
+  const order = Object.keys(LEGEND) as FlowKind[];
+  $('#legend').innerHTML = order
+    .filter((k) => used.has(k))
     .map((k) => `<span class="lg"><i class="pkt-dot pkt-${k}"></i>${LEGEND[k]}</span>`)
     .join('');
 }
