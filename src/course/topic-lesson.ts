@@ -27,7 +27,10 @@ function formatBytes(n: number): string {
   return `${n} MB`;
 }
 
-type AcademyDomain = 'cache' | 'database' | 'queue' | 'payment' | 'ai' | 'api' | 'security' | 'network' | 'interview' | 'case';
+type AcademyDomain =
+  | 'cache' | 'database' | 'queue' | 'payment' | 'ai' | 'api' | 'security'
+  | 'network' | 'interview' | 'case'
+  | 'frontend-app' | 'frontend-tech' | 'frontend-ui' | 'frontend-general';
 
 function academyDomain(title: string): AcademyDomain {
   const s = title.toLowerCase();
@@ -43,6 +46,19 @@ function academyDomain(title: string): AcademyDomain {
   return 'case';
 }
 
+function frontEndDomain(title: string, module: string): AcademyDomain {
+  if (module === 'General') return 'frontend-general';
+  if (module === 'User Interface Components') return 'frontend-ui';
+  if (module === 'Techniques / Topics') return 'frontend-tech';
+  const s = title.toLowerCase();
+  if (/chat|messenger|slack|discord/.test(s)) return 'frontend-app';
+  if (/video|stream|music|audio|spotify|youtube|netflix/.test(s)) return 'frontend-app';
+  if (/photo|pinterest|instagram|image|gallery/.test(s)) return 'frontend-app';
+  if (/e-commerce|amazon|shopping|checkout|travel|booking|airbnb/.test(s)) return 'frontend-app';
+  if (/news|feed|twitter|facebook|reddit|search|map|email|calendar/.test(s)) return 'frontend-app';
+  return 'frontend-app';
+}
+
 interface TopicNarrative {
   core: string;
   mechanism: string;
@@ -52,6 +68,34 @@ interface TopicNarrative {
 }
 
 const academyNarratives: Record<AcademyDomain, TopicNarrative> = {
+  'frontend-general': {
+    core: 'Front-end system design begins with a browser-level requirement: what renders, what responds, what loads, and what must remain accessible.',
+    mechanism: 'Map the request and render critical path, establish a performance budget, choose state and rendering boundaries, and test constrained devices.',
+    tradeoff: 'Framework convenience can reduce implementation cost while adding bytes or runtime work. The best choice is tied to the user and interaction budget.',
+    caseStudy: 'The initial page or interaction misses its budget. Profile resource timing and JavaScript work, then remove the largest avoidable cost.',
+    recap: 'Define browser requirements, measure LCP/INP and bundle cost, isolate the bottleneck, and verify loading and failure states.',
+  },
+  'frontend-app': {
+    core: 'A large front-end application needs explicit boundaries for routes, data freshness, UI state, rendering, assets, and failure.',
+    mechanism: 'Split data from presentation, paginate or virtualize hot surfaces, cache stable assets and responses, and stream only what the route needs.',
+    tradeoff: 'A richer client path can improve responsiveness but increases JavaScript, state synchronization, cache invalidation, and testing surface.',
+    caseStudy: 'A feed or result page becomes slow under high item count. Window visible work, preserve cursor pagination, and protect API and cache failures.',
+    recap: 'Measure route boot, DOM size, request fan-out, cache hit rate, interaction latency, accessibility, and offline behavior.',
+  },
+  'frontend-tech': {
+    core: 'A browser technique should move or remove a measured cost across bytes, requests, execution, layout, paint, or memory.',
+    mechanism: 'Establish a representative workload, apply one mechanism, and compare LCP, INP, bundle bytes, memory, and cache behavior.',
+    tradeoff: 'Deferring work improves initial loading but moves it to interaction or idle time. Removing a library may add custom maintenance cost.',
+    caseStudy: 'A performance patch improves one metric and worsens another. Keep only the change that improves the user-critical path within the budget.',
+    recap: 'Report before and after by metric, preserve accessibility and correctness, and define the network/device assumptions.',
+  },
+  'frontend-ui': {
+    core: 'A UI component is a contract for props, state, semantics, focus, keyboard input, responsive layout, virtualization, and error states.',
+    mechanism: 'Define the interaction model, render only visible or required items, preserve accessible names and focus, and expose loading and empty states.',
+    tradeoff: 'Virtualization reduces DOM and layout cost but complicates height measurement and focus. Rich interactions increase state and test cost.',
+    caseStudy: 'A table or picker stalls with a large dataset. Window rows, memoize stable rendering, and verify keyboard traversal and screen-reader output.',
+    recap: 'Implement the complete interaction contract and test empty, loading, error, large-data, keyboard, and assistive-technology states.',
+  },
   cache: {
     core: 'A cache is useful only when it removes measured origin work without violating the required freshness boundary.',
     mechanism: 'Choose cache key, TTL, write policy, miss policy, memory limit, and invalidation owner. Then compare hit ratio, origin load, and stale-read risk.',
@@ -142,6 +186,70 @@ interface ModuleContext {
 }
 
 const contexts: Record<string, ModuleContext> = {
+  'General': {
+    tone: 'yellow', level: 'Intermediate', minutes: 9,
+    core: 'Front-end system design starts with the browser experience: initial render, interaction, network, state, accessibility, and failure behavior.',
+    mechanism: 'Clarify the user flow and constraints, map browser and network stages, choose state boundaries, and measure the largest user-visible cost.',
+    tradeoff: 'A framework or architecture improves one workload while adding runtime, tooling, or code complexity. Choose only mechanisms tied to a measured browser constraint.',
+    caseStudy: 'A page loads slowly or interaction stalls. Trace resource timing, rendering work, state updates, and network fan-out before changing frameworks.',
+    recap: 'State the browser requirements, follow the critical rendering path, protect interaction and accessibility, and verify degraded network behavior.',
+    coreName: 'Browser shell', coreIcon: 'globe', storeName: 'Client state', storeIcon: 'layers',
+    metrics: [
+      { key: 'lcp', label: 'LCP', icon: 'timer' },
+      { key: 'inp', label: 'INP', icon: 'gauge' },
+      { key: 'bundle', label: 'Bundle', icon: 'box' },
+      { key: 'requests', label: 'Requests', icon: 'activity' },
+    ],
+    legend: ['request', 'response', 'heavy', 'fail'],
+  },
+  'Applications': {
+    tone: 'orange', level: 'Advanced', minutes: 12,
+    core: 'A front-end application is an interactive client with routes, data, state, assets, accessibility, optimistic updates, and offline or degraded behavior.',
+    mechanism: 'Split application requirements by data freshness, interaction latency, rendering cost, ownership, and failure. Build the smallest architecture that keeps those boundaries explicit.',
+    tradeoff: 'Client-side complexity can improve immediacy but increases bundle size, state bugs, cache invalidation, and testing cost.',
+    caseStudy: 'The application becomes slow while a feed, list, or media surface is hot. Measure initial data, DOM work, network fan-out, and cache freshness before adding state libraries.',
+    recap: 'Design the data and component boundaries, protect the interaction budget, add progressive loading, and test offline or partial API failure.',
+    coreName: 'App shell', coreIcon: 'box', storeName: 'View state', storeIcon: 'layers',
+    metrics: [
+      { key: 'lcp', label: 'LCP', icon: 'timer' },
+      { key: 'dom', label: 'DOM nodes', icon: 'layers' },
+      { key: 'bundle', label: 'JS bundle', icon: 'box' },
+      { key: 'hit', label: 'Cache hit', icon: 'bolt' },
+    ],
+    legend: ['request', 'response', 'hit', 'heavy', 'fail'],
+  },
+  'Techniques / Topics': {
+    tone: 'blue', level: 'Intermediate', minutes: 9,
+    core: 'Front-end technique choices are measured by browser cost: bytes, requests, layout, paint, JavaScript execution, memory, or network freshness.',
+    mechanism: 'Name the current bottleneck, apply one browser mechanism, and compare before and after with a representative device and network.',
+    tradeoff: 'A technique that removes work in one browser phase can move cost to another. Preserve correctness and accessibility while reducing the critical phase.',
+    caseStudy: 'A visual improvement adds JavaScript but worsens interaction latency. Keep the smallest implementation and defer or remove the rest.',
+    recap: 'Use the performance budget, measure on real constraints, isolate the work, and retain a rollback or no-JavaScript fallback.',
+    coreName: 'Browser work', coreIcon: 'cpu', storeName: 'Cache / state', storeIcon: 'bolt',
+    metrics: [
+      { key: 'lcp', label: 'LCP', icon: 'timer' },
+      { key: 'bundle', label: 'Bundle', icon: 'box' },
+      { key: 'requests', label: 'Requests', icon: 'activity' },
+      { key: 'inp', label: 'INP', icon: 'gauge' },
+    ],
+    legend: ['request', 'response', 'hit', 'heavy', 'fail'],
+  },
+  'User Interface Components': {
+    tone: 'teal', level: 'Intermediate', minutes: 10,
+    core: 'A UI component is a boundary for interaction, state, accessibility, focus, keyboard behavior, responsive layout, and rendering cost.',
+    mechanism: 'Define the component contract, interaction states, accessible semantics, virtualization or pagination, and data ownership before drawing pixels.',
+    tradeoff: 'Virtualization reduces DOM cost but complicates measurement and accessibility. Rich client state improves responsiveness but increases synchronization work.',
+    caseStudy: 'A list or picker works for small data but stalls with thousands of items. Window rendering, preserve interaction semantics, and keep keyboard navigation complete.',
+    recap: 'Define props and events, implement keyboard and screen-reader behavior, reduce rendered work, and test empty, loading, error, and large-data states.',
+    coreName: 'Component', coreIcon: 'box', storeName: 'Item state', storeIcon: 'layers',
+    metrics: [
+      { key: 'items', label: 'Items', icon: 'layers' },
+      { key: 'dom', label: 'Rendered DOM', icon: 'box' },
+      { key: 'inp', label: 'INP', icon: 'gauge' },
+      { key: 'a11y', label: 'A11y checks', icon: 'shield' },
+    ],
+    legend: ['request', 'response', 'heavy', 'hit'],
+  },
   'System Design Case Study': {
     tone: 'grey', level: 'Advanced', minutes: 11,
     core: 'Begin with the real workload: users, traffic shape, data volume, latency budget, consistency, cost, and the failure that broke the original design.',
@@ -466,9 +574,33 @@ const contexts: Record<string, ModuleContext> = {
 
 export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Lesson {
   const ctx = contexts[module] ?? contexts['How it Works?']!;
-  const domain = module.startsWith('academy') ? academyDomain(title) : academyDomain(title);
+  const domain =
+    module === 'General' || module === 'Applications'
+    || module === 'Techniques / Topics' || module === 'User Interface Components'
+      ? frontEndDomain(title, module)
+      : (module.startsWith('academy') ? academyDomain(title) : academyDomain(title));
   const narrative = academyNarratives[domain];
   const parametersByDomain: Record<AcademyDomain, DynamicParameter[]> = {
+    'frontend-general': [
+      { key: 'bundle', label: 'JavaScript bundle', min: 50, max: 2_000, step: 50, default: 350, unit: ' KB', description: 'Compressed JavaScript shipped to the browser.' },
+      { key: 'requests', label: 'Initial requests', min: 1, max: 100, step: 1, default: 12, unit: ' requests', description: 'Network requests needed for initial render.' },
+      { key: 'slow4g', label: 'Slow 4G RTT', min: 50, max: 1_000, step: 10, default: 150, unit: ' ms', description: 'Representative network round-trip time.' },
+    ],
+    'frontend-app': [
+      { key: 'users', label: 'Concurrent users', min: 100, max: 10_000_000, step: 100, default: 100_000, unit: ' users', description: 'Active client sessions.' },
+      { key: 'items', label: 'Visible items', min: 10, max: 10_000, step: 10, default: 500, unit: ' items', description: 'Items or rows in the rendered surface.' },
+      { key: 'hitRate', label: 'Cache hit rate', min: 50, max: 99, step: 1, default: 85, unit: '%', description: 'Responses served from client or edge cache.' },
+    ],
+    'frontend-tech': [
+      { key: 'bundle', label: 'Bundle size', min: 50, max: 2_000, step: 50, default: 350, unit: ' KB', description: 'JavaScript transferred for the route.' },
+      { key: 'networkRtt', label: 'Network RTT', min: 50, max: 1_000, step: 10, default: 150, unit: ' ms', description: 'Network round-trip time.' },
+      { key: 'cpuSlowdown', label: 'CPU slowdown', min: 1, max: 6, step: 0.5, default: 4, unit: '×', description: 'CPU slowdown relative to the reference device.' },
+    ],
+    'frontend-ui': [
+      { key: 'items', label: 'Data items', min: 10, max: 100_000, step: 10, default: 5_000, unit: ' items', description: 'Items held by the component.' },
+      { key: 'windowSize', label: 'Rendered window', min: 10, max: 500, step: 10, default: 50, unit: ' items', description: 'Items mounted in the DOM.' },
+      { key: 'a11yChecks', label: 'A11y checks', min: 1, max: 30, step: 1, default: 12, unit: ' checks', description: 'Keyboard, focus, semantics, and contrast checks.' },
+    ],
     cache: [
       { key: 'traffic', label: 'Read traffic', min: 100, max: 100_000, step: 100, default: 12_000, unit: ' req/s', description: 'Read requests entering the cache tier.' },
       { key: 'hitRate', label: 'Hit rate', min: 50, max: 99, step: 1, default: 90, unit: '%', description: 'Requests answered by the cache.' },
@@ -596,6 +728,60 @@ export function makeTopicLesson({ slug, title, module }: TopicLessonOptions): Le
         latency: { v: `${p99} ms`, tone: p99 > 1_000 ? 'bad' : p99 > 400 ? 'warn' : 'good' },
         cost: { v: `$${cost.toFixed(3)}/s`, tone: utilization > 0.9 ? 'warn' : undefined },
         fallback: { v: utilization > 0.97 ? 'warm fallback' : `${gpus} GPUs active`, tone: utilization > 0.97 ? 'bad' : 'good' },
+      };
+    }
+    if (domain === 'frontend-general') {
+      const bundle = input.bundle ?? 350;
+      const requests = input.requests ?? 12;
+      const rtt = input.slow4g ?? 150;
+      const downloadMs = Math.round(bundle / 3);
+      const lcp = Math.round(rtt * 2 + downloadMs + requests * 8);
+      const inp = Math.round(80 + bundle * 0.12 + requests * 2);
+      return {
+        lcp: { v: `${lcp} ms`, tone: lcp > 2_500 ? 'bad' : lcp > 1_800 ? 'warn' : 'good' },
+        inp: { v: `${inp} ms`, tone: inp > 200 ? 'bad' : inp > 100 ? 'warn' : 'good' },
+        bundle: { v: `${bundle} KB`, tone: bundle > 1_000 ? 'bad' : bundle > 500 ? 'warn' : 'good' },
+        requests: { v: `${requests} initial`, tone: requests > 30 ? 'warn' : 'good' },
+      };
+    }
+    if (domain === 'frontend-app') {
+      const users = input.users ?? 100_000;
+      const items = input.items ?? 500;
+      const hitRate = input.hitRate ?? 85;
+      const domNodes = Math.min(20_000, items * 18);
+      const lcp = Math.round(800 + users / 100_000 * 120 + (100 - hitRate) * 18);
+      return {
+        lcp: { v: `${lcp} ms`, tone: lcp > 2_500 ? 'bad' : lcp > 1_800 ? 'warn' : 'good' },
+        dom: { v: domNodes.toLocaleString(), tone: domNodes > 10_000 ? 'bad' : domNodes > 5_000 ? 'warn' : 'good' },
+        bundle: { v: `${Math.round(180 + items * 0.08)} KB`, tone: items > 5_000 ? 'warn' : 'good' },
+        hit: { v: `${hitRate}%`, tone: hitRate >= 90 ? 'good' : hitRate >= 70 ? 'warn' : 'bad' },
+      };
+    }
+    if (domain === 'frontend-tech') {
+      const bundle = input.bundle ?? 350;
+      const rtt = input.networkRtt ?? 150;
+      const slowdown = input.cpuSlowdown ?? 4;
+      const lcp = Math.round(rtt * 2 + bundle / 2.8 + slowdown * 80);
+      const inp = Math.round(60 + bundle * 0.1 + slowdown * 35);
+      return {
+        lcp: { v: `${lcp} ms`, tone: lcp > 2_500 ? 'bad' : lcp > 1_800 ? 'warn' : 'good' },
+        bundle: { v: `${bundle} KB`, tone: bundle > 1_000 ? 'bad' : bundle > 500 ? 'warn' : 'good' },
+        requests: { v: `${Math.max(1, Math.round(bundle / 70))} critical`, tone: bundle > 500 ? 'warn' : 'good' },
+        inp: { v: `${inp} ms`, tone: inp > 200 ? 'bad' : inp > 100 ? 'warn' : 'good' },
+      };
+    }
+    if (domain === 'frontend-ui') {
+      const items = input.items ?? 5_000;
+      const windowSize = input.windowSize ?? 50;
+      const checks = input.a11yChecks ?? 12;
+      const domNodes = Math.round(windowSize * 18);
+      const inp = Math.round(50 + windowSize * 1.8 + items / 500);
+      const a11y = Math.round(checks / 12 * 100);
+      return {
+        items: { v: items.toLocaleString(), tone: items > 50_000 ? 'warn' : undefined },
+        dom: { v: domNodes.toLocaleString(), tone: domNodes > 5_000 ? 'bad' : domNodes > 2_000 ? 'warn' : 'good' },
+        inp: { v: `${inp} ms`, tone: inp > 200 ? 'bad' : inp > 100 ? 'warn' : 'good' },
+        a11y: { v: `${Math.min(100, a11y)}%`, tone: a11y >= 90 ? 'good' : a11y >= 70 ? 'warn' : 'bad' },
       };
     }
     if (domain === 'api') {

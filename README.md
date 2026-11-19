@@ -41,6 +41,14 @@ study, while the remaining Academy entries use reusable cache, database,
 queue, payment, AI, API, security, network, interview, and case-study adapters.
 They are not copies of upstream article text or visuals.
 
+The catalog also merges 285 unique titles from
+GreatFrontEnd’s `awesome-front-end-system-design` repository into four modules:
+General, Applications, Techniques / Topics, and User Interface Components.
+These entries use original front-end narratives and browser, application,
+network, cache, and UI-component formulas. Third-party MIT attribution is
+recorded in `THIRD_PARTY_LICENSES.md`; upstream articles and assets are not
+copied.
+
 ## Practice
 
 The Practice tab (`#/practice`) has 52 drills — one set per module plus a weighted mixed review:

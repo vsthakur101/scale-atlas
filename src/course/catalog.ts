@@ -1,6 +1,7 @@
 import type { ModuleDef } from '../types';
 import { SOURCE_MODULES } from './source-index';
 import { ACADEMY_MODULES } from './academy-index';
+import { FRONTEND_MODULES } from './front-end-index';
 
 /**
  * The whole course map. A lesson with `load` is written; one without is listed as
@@ -114,7 +115,7 @@ const CORE_MODULES: ModuleDef[] = [
 ];
 
 /** Authored lessons first; the upstream topic index stays visible as planned content. */
-export const MODULES: ModuleDef[] = [...CORE_MODULES, ...SOURCE_MODULES, ...ACADEMY_MODULES];
+export const MODULES: ModuleDef[] = [...CORE_MODULES, ...SOURCE_MODULES, ...ACADEMY_MODULES, ...FRONTEND_MODULES];
 
 export interface LessonLocation {
   moduleIndex: number;
