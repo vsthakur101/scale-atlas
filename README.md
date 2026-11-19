@@ -36,7 +36,18 @@ The Practice tab (`#/practice`) has 52 drills — one set per module plus a weig
 
 Every drill links back to the lesson step that teaches it. History (per-drill last result, streak) is kept in `localStorage` under `atlas:practice*`; mixed review favours drills you missed or haven't tried. Code lives in `src/practice/` (`drills-core.ts`, `drills-advanced.ts` for content; `view.ts` for the UI).
 
-Shell features: course tree with per-module progress, lesson stepper, keyboard nav (`←` `→` `R` `Space` `/` `⌘K`), swipe on touch, search palette over concepts and steps, light/dark theme with no flash, three layouts (desktop / tablet drawer / stacked phone), read-aloud, copy step link, print-a-lesson view, reduced-motion support. Design Lab / Cheatsheets tabs and the language menu are placeholders.
+## Design Lab
+
+The Design Lab tab (`#/lab`) is a live capacity simulator. Add components (CDN, load balancer, app servers, cache, queue, workers, database with optional hot standby, read replicas), link them, and every change re-runs a steady-state traffic model:
+
+- Requests flow through the links in column order; reads go cache → stores, writes go queue → workers → database or straight to the primary. Each component serves up to its capacity and drops the excess.
+- Latency per component follows the queueing curve `base × (1 + 3ρ²/(1−ρ))`; p99 is the slowest path carrying ≥1% of traffic.
+- A component is a single point of failure if losing it (or one of its instances) adds >5% errors or stops writes reaching a database.
+- **Break mode** fails components (one instance, then all) so you can watch failover or collapse.
+
+Five challenges (first launch, launch day, read storm, no single point of failure, write burst) each have live pass/fail goals and a reference solution that is verified to pass. The sandbox has adjustable traffic and a shareable link (`#/lab/sandbox/<code>`). Designs and solved challenges save in `localStorage` under `atlas:lab*`. Code: `src/lab/` (`model.ts`, `sim.ts`, `challenges.ts`, `view.ts`).
+
+Shell features: course tree with per-module progress, lesson stepper, keyboard nav (`←` `→` `R` `Space` `/` `⌘K`), swipe on touch, search palette over concepts and steps, light/dark theme with no flash, three layouts (desktop / tablet drawer / stacked phone), read-aloud, copy step link, print-a-lesson view, reduced-motion support. The Cheatsheets tab and the language menu are placeholders.
 
 ## Layout
 
@@ -49,6 +60,7 @@ src/
   course/kit.ts           authoring helpers (at, box, db, crowd, link, flow, pill, patch)
   course/lessons/*.ts     one file per lesson, code-split
   practice/               drill sets, grading, progress and the Practice view (lazy-loaded)
+  lab/                    Design Lab: component model, traffic simulator, challenges, view (lazy-loaded)
   ui/search.ts, toast.ts  palette + toasts
   store.ts                localStorage (prefix `atlas:`), guarded
   site.ts                 name / author branding

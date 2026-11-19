@@ -357,7 +357,7 @@ function paintAnswer(idx: number): void {
         if (pickedId && pickedId !== d.answer) board.mark(pickedId, 'bad');
       } else {
         board.setClickHandler((id) => {
-          if (ids.has(id)) submit(idx, { kind: 'node', id });
+          if (id && ids.has(id)) submit(idx, { kind: 'node', id });
         });
       }
     }

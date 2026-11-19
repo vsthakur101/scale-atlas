@@ -354,7 +354,7 @@ export class Board {
   private reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   /** ids for <defs> are per-board: a url(#…) into a hidden SVG renders nothing */
   private uid = `b${++boardSeq}`;
-  private clickHandler: ((id: string) => void) | null = null;
+  private clickHandler: ((id: string | null) => void) | null = null;
 
   constructor(host: HTMLElement) {
     host.innerHTML = '';
@@ -385,23 +385,22 @@ export class Board {
     this.svg.addEventListener('click', (e) => {
       if (!this.clickHandler) return;
       const g = (e.target as Element).closest<SVGGElement>('.l-nodes > g.node, .l-pills > g.pillset');
-      const id = g?.dataset.id;
-      if (id) this.clickHandler(id);
+      this.clickHandler(g?.dataset.id ?? null);
     });
     this.raf = requestAnimationFrame(this.tick);
   }
 
   /** Make nodes clickable (practice drills). Pass null to turn it off. */
-  setClickHandler(fn: ((id: string) => void) | null): void {
+  setClickHandler(fn: ((id: string | null) => void) | null): void {
     this.clickHandler = fn;
     this.svg.classList.toggle('clickable', !!fn);
   }
 
   /** Outline a node as a right or wrong pick; null clears it. */
-  mark(id: string, tone: 'good' | 'bad' | null): void {
+  mark(id: string, tone: 'good' | 'bad' | 'sel' | null): void {
     const g = this.nodes.querySelector<SVGGElement>(`:scope > g[data-id="${CSS.escape(id)}"]`);
     if (!g) return;
-    g.classList.remove('mark-good', 'mark-bad');
+    g.classList.remove('mark-good', 'mark-bad', 'mark-sel');
     if (tone) g.classList.add(`mark-${tone}`);
   }
 

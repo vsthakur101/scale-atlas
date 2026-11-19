@@ -76,7 +76,7 @@ function renderShell(): void {
     <nav class="tabs" aria-label="Sections">
       <button class="tab active" data-tab="learn">${icon('learn', 15)}<span>Learn</span></button>
       <button class="tab" data-tab="practice">${icon('dumbbell', 15)}<span>Practice</span></button>
-      <button class="tab" data-tab="Design Lab">${icon('flask', 15)}<span>Design Lab</span></button>
+      <button class="tab" data-tab="lab">${icon('flask', 15)}<span>Design Lab</span></button>
       <button class="tab" data-tab="Cheatsheets">${icon('sheet', 15)}<span>Cheatsheets</span></button>
     </nav>
     <div class="top-right">
@@ -122,6 +122,7 @@ function renderShell(): void {
     </div>
   </div>
   <div class="shell practice-shell" id="practice-view" hidden></div>
+  <div class="shell practice-shell lab-shell" id="lab-view" hidden></div>
   <div class="scrim" id="scrim"></div>
   <div class="print-view" id="print-view"></div>`;
 
@@ -139,6 +140,8 @@ function renderShell(): void {
         location.hash = last ? `#/${last.slug}/${last.step}` : `#/${BUILT_LESSONS[0]!.slug}/1`;
       } else if (tab === 'practice') {
         location.hash = '#/practice';
+      } else if (tab === 'lab') {
+        location.hash = '#/lab';
       } else {
         toast(`${tab} is coming soon`, 'sparkle');
       }
@@ -501,15 +504,17 @@ function go(slug: string, stepNo: number): void {
 }
 
 let routeToken = 0;
-type View = 'learn' | 'practice';
+type View = 'learn' | 'practice' | 'lab';
 let currentView: View = 'learn';
 let practice: typeof import('./practice/view') | null = null;
+let lab: typeof import('./lab/view') | null = null;
 
 function setView(v: View): void {
   currentView = v;
   document.body.dataset.view = v;
   $('#learn-view').hidden = v !== 'learn';
   $('#practice-view').hidden = v !== 'practice';
+  $('#lab-view').hidden = v !== 'lab';
   document.querySelectorAll<HTMLButtonElement>('.tab').forEach((b) => {
     const on = b.dataset.tab === v;
     b.classList.toggle('active', on);
@@ -535,9 +540,28 @@ async function routePracticeView(): Promise<void> {
   practice.routePractice(location.hash);
 }
 
+async function routeLabView(): Promise<void> {
+  const token = ++routeToken;
+  try {
+    lab ??= await import('./lab/view');
+  } catch (err) {
+    console.error('Failed to load design lab', { err });
+    toast('Design Lab failed to load. Check your connection and retry.', 'alert', 4000);
+    return;
+  }
+  if (token !== routeToken) return;
+  lab.mountLab($('#lab-view'));
+  setView('lab');
+  lab.routeLab(location.hash);
+}
+
 async function route(): Promise<void> {
   if (location.hash.startsWith('#/practice')) {
     await routePracticeView();
+    return;
+  }
+  if (location.hash.startsWith('#/lab')) {
+    await routeLabView();
     return;
   }
   if (currentView !== 'learn') {
@@ -605,8 +629,8 @@ function onKey(e: KeyboardEvent): void {
   if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
   if (document.querySelector('.palette')) return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
-  if (currentView === 'practice') {
-    if (practice?.onPracticeKey(e)) {
+  if (currentView === 'practice' || currentView === 'lab') {
+    if ((currentView === 'practice' ? practice?.onPracticeKey(e) : lab?.onLabKey(e))) {
       e.preventDefault();
       return;
     }
