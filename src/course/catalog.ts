@@ -45,6 +45,7 @@ const CORE_MODULES: ModuleDef[] = [
       { slug: 'consistent-hashing', title: 'Consistent Hashing', load: () => import('./lessons/consistent-hashing') },
       { slug: 'ids', title: 'Generating IDs', load: () => import('./lessons/ids') },
       { slug: 'consistency-models', title: 'Consistency Models', load: () => import('./lessons/consistency-models') },
+      { slug: 'crdts', title: 'CRDTs', load: () => import('./lessons/crdts') },
       { slug: 'consensus', title: 'Leader Election & Consensus', load: () => import('./lessons/consensus') },
       { slug: 'transactions', title: 'Transactions', load: () => import('./lessons/transactions') },
       { slug: 'blob-storage', title: 'Blob Storage', load: () => import('./lessons/blob-storage') },

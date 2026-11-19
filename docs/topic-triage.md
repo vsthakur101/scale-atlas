@@ -25,25 +25,25 @@ Why Redis is fast (event loop, persistence, pipelining) · Database isolation le
 semantics + "can Kafka lose messages?" · S3-style durability (erasure coding maths) · Idempotency / double payment ·
 Consistency patterns (read-your-writes, read repair) · Geospatial search (geohash / quadtree, nearby drivers)
 
-**Batch 4 — distributed systems**
+**Batch 4 — distributed systems** (DONE 2026-11-19)
 Distributed lock · Failure detection (heartbeats, phi-accrual) · Clocks and leap seconds · Unique-ID generators (Snowflake)
 · Quotient filter · Actor model · Sidecar/service mesh · Resiliency patterns · Erasure-coding repair · CRDTs
 · Stock exchange parts 2 & 3 · Time-series databases · Sharding algorithms
 
-**Batch 5 — networking & security**
+**Batch 5 — networking & security** (DONE 2026-11-19)
 DNS · HTTP/1 → 2 → 3 · TLS handshake · TCP vs UDP · NAT · gRPC · GraphQL · API pagination · Webhooks vs polling · WebSockets
 · OAuth 2.0 flows · JWT · Passwords & hashing · TOTP authenticators · Digital signatures · SSH/VPN
 
-**Batch 6 — systems & infrastructure**
+**Batch 6 — systems & infrastructure** (DONE 2026-11-19)
 How Kubernetes works · Docker/containers · CI/CD · GitOps/Terraform · Logs-traces-metrics pipeline · Lambda internals
 · Virtual machines · Nginx and C10K · Load-balancing algorithms · Disaster recovery · High availability maths
 
-**Batch 7 — case studies (mechanisms only; figures labelled illustrative)**
+**Batch 7 — case studies (mechanisms only; figures labelled illustrative) (8 written 2026-11-19; remainder of list left for later)**
 Uber ETA / payments · WhatsApp · Discord message storage · Slack message journey · Netflix (caching, chaos) · Twitter
 timeline · YouTube upload · Figma/Google Docs collaboration · Google search & crawler · Zoom/live streaming · Flash sales
 · Payments (card network, UPI, ACH, SWIFT, reconciliation) · Gmail · Maps · Stack Overflow
 
-**Batch 8 — AI systems (separate module)**
+**Batch 8 — AI systems (5 written 2026-11-19)**
 RAG · Vector search · LLM inference & KV cache · Agents & MCP · Evals & guardrails
 
 ## DROP / not lessons (~300)

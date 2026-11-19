@@ -39,7 +39,7 @@ const lesson: Lesson = {
     ],
     calculate: (input, step) => {
       const n = Math.max(1, Math.round(input.cores ?? 8));
-      const p = (input.parallel ?? 90) / 100;
+      const p = Math.min(0.9999, (input.parallel ?? 90) / 100);
       const wc = input.wc ?? 9;
       // Amdahl: S = 1 / ((1 − p) + p / N)
       const speed = 1 / (1 - p + p / n);
