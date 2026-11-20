@@ -178,4 +178,14 @@ export const PUBLISHED: ReadonlySet<string> = new Set([
   'academy-real-time-presence-platform',
   'academy-how-dropbox-scaled-to-100-thousand-users-in-a-year-after-launch',
   'academy-llm-as-a-judge',
+  // batch 19
+  'source-what-is-serverless-db',
+  'source-how-does-visa-make-money',
+  'academy-how-discord-boosts-performance-with-code-splitting',
+  'source-how-does-twitter-recommend-for-you-timeline-in-1-5-seconds',
+  'academy-how-zapier-automates-billions-of-tasks',
+  'academy-how-to-build-ai-agents-that-don-t-start-over-when-they-fail',
+  'source-types-of-memory-and-storage',
+  'source-how-to-avoid-crawling-duplicate-urls-at-google-scale',
+  'academy-api-versioning',
 ]);
