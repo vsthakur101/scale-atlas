@@ -158,4 +158,14 @@ export const PUBLISHED: ReadonlySet<string> = new Set([
   'academy-amazon-prime-video-microservices-top-failure',
   'academy-tumblr-shares-database-migration-strategy-with-60-billion-rows',
   'academy-this-is-how-airbnb-adopted-http-streaming-to-save-84-million-usd-in-costs',
+  // batch 17
+  'source-handling-hotspot-accounts',
+  'source-how-do-c-java-python-work',
+  'academy-back-of-the-envelope',
+  'source-how-password-managers-work',
+  'source-ipv4-vs-ipv6-differences',
+  'source-top-9-causes-of-100-cpu-usage',
+  'academy-how-timsort-algorithm-works',
+  'academy-how-meta-achieves-99-99999999-cache-consistency',
+  'academy-how-linkedin-adopted-protocol-buffers-to-reduce-latency-by-60',
 ]);
