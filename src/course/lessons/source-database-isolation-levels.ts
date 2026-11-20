@@ -15,7 +15,7 @@ const ANOMALIES: ReadonlyArray<string> = [
 
 const lesson: Lesson = {
   slug: 'source-database-isolation-levels',
-  title: 'Database Isolation Levels',
+  title: 'Isolation Levels and the Anomalies They Allow',
   blurb: 'What concurrent transactions can see of each other: the anomalies, the levels that prevent them, and the retries you pay for strictness.',
   minutes: 14,
   level: 'Advanced',

@@ -45,7 +45,7 @@ const pct = (p: number): string => (p > 0.999999 ? '> 99.9999%' : `${(p * 100).t
 
 const lesson: Lesson = {
   slug: 'academy-amazon-dynamo',
-  title: 'Amazon Dynamo',
+  title: 'The Dynamo Design: Highly Available Key–Value Storage',
   blurb: 'The 2007 design that chose availability over consistency on purpose — consistent hashing, tunable quorums, vector clocks, Merkle-tree repair — and what each choice costs.',
   minutes: 16,
   level: 'Advanced',

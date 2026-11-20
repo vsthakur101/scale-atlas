@@ -14,7 +14,7 @@ const KV_MB_PER_TOKEN_70B = 0.32; // 80 layers × 8 KV heads × 128 dim × 2 (K 
 
 const lesson: Lesson = {
   slug: 'academy-how-llm-inference-works',
-  title: 'How LLM Inference Works',
+  title: 'LLM Inference: Prefill, Decode and the KV Cache',
   blurb: 'Prefill is compute-bound, decode is memory-bandwidth-bound, and the KV cache is the memory bill that long context and big batches keep running up.',
   minutes: 15,
   level: 'Advanced',

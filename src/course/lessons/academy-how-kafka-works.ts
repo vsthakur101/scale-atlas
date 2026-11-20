@@ -17,7 +17,7 @@ const fmtTB = (tb: number): string => (tb >= 1000 ? `${(tb / 1000).toFixed(1)} P
 
 const lesson: Lesson = {
   slug: 'academy-how-kafka-works',
-  title: 'How Kafka Works',
+  title: 'Kafka Internals: Logs, Partitions and Consumer Groups',
   blurb: 'A distributed, replicated, append-only log: partitions for parallelism, consumer groups for scale-out reading, and replication settings that decide what “committed” means.',
   minutes: 14,
   level: 'Intermediate',

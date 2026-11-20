@@ -1,8 +1,6 @@
 import type { ModuleDef } from '../types';
 import { SOURCE_MODULES } from './source-index';
 import { ACADEMY_MODULES } from './academy-index';
-import { FRONTEND_MODULES } from './front-end-index';
-import { PUBLISHED } from './published';
 
 /**
  * The whole course map. A lesson with `load` is written; one without is listed as
@@ -116,19 +114,8 @@ const CORE_MODULES: ModuleDef[] = [
   },
 ];
 
-/** Keep only authored lessons from a topic index; drop modules that end up empty. */
-const published = (modules: ModuleDef[]): ModuleDef[] =>
-  modules
-    .map((m) => ({ ...m, lessons: m.lessons.filter((l) => PUBLISHED.has(l.slug)) }))
-    .filter((m) => m.lessons.length > 0);
-
-/** Core course first, then the topic library (authored entries only). */
-export const MODULES: ModuleDef[] = [
-  ...CORE_MODULES,
-  ...published(SOURCE_MODULES),
-  ...published(ACADEMY_MODULES),
-  ...published(FRONTEND_MODULES),
-];
+/** Core course first, then the topic library (every entry here is an authored lesson). */
+export const MODULES: ModuleDef[] = [...CORE_MODULES, ...SOURCE_MODULES, ...ACADEMY_MODULES];
 
 export interface LessonLocation {
   moduleIndex: number;

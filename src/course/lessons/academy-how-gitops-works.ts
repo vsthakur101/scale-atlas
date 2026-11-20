@@ -12,7 +12,7 @@ const fmtN = (n: number): string => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >
 
 const lesson: Lesson = {
   slug: 'academy-how-gitops-works',
-  title: 'How GitOps Works',
+  title: 'GitOps: Git as the Source of Truth for Deployments',
   blurb: 'Git as the single source of truth and an in-cluster agent that continuously reconciles reality to it: drift healing, rollbacks as reverts, and what the polling interval costs and buys.',
   minutes: 12,
   level: 'Intermediate',

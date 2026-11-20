@@ -50,7 +50,7 @@ const HINT_WINDOW_MIN = 180;
 
 const lesson: Lesson = {
   slug: 'academy-hinted-handoff',
-  title: 'Hinted Handoff',
+  title: 'Hinted Handoff: Keeping Writes Available During Node Failures',
   blurb: 'When a replica is down, write to a stand-in with a note saying whom the data belongs to — and hand it over when the node returns.',
   minutes: 12,
   level: 'Advanced',

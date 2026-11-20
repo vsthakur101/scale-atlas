@@ -15,7 +15,7 @@ const fmtGB = (b: number): string => (b >= 1e9 ? `${(b / 1e9).toFixed(b >= 1e10 
 
 const lesson: Lesson = {
   slug: 'academy-real-time-gaming-leaderboard',
-  title: 'Real-Time Gaming Leaderboard',
+  title: 'Real-Time Leaderboards with Sorted Sets and Sharding',
   blurb: 'Rank hundreds of millions of players, update scores instantly, and answer “where am I?” in milliseconds — and see why sharding a leaderboard is trickier than sharding a table.',
   minutes: 13,
   level: 'Intermediate',

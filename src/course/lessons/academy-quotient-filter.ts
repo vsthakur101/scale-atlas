@@ -12,7 +12,7 @@ const fmtP = (p: number): string => (p >= 0.1 ? `${(p * 100).toFixed(1)}%` : p >
 
 const lesson: Lesson = {
   slug: 'academy-quotient-filter',
-  title: 'Quotient Filters',
+  title: 'Quotient Filters: Compact, Mergeable Approximate Sets',
   blurb: 'A Bloom-filter alternative that stores small fingerprints in a compact table — so it can delete, merge and resize, and stays cache-friendly.',
   minutes: 13,
   level: 'Advanced',

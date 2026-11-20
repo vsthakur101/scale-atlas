@@ -14,7 +14,7 @@ const KEY_BYTES = [256, 64, 32];
 
 const lesson: Lesson = {
   slug: 'source-how-digital-signatures-work',
-  title: 'How Digital Signatures Work',
+  title: 'Digital Signatures: Signing, Verifying and Trusting Keys',
   blurb: 'Sign a hash with a private key, verify with a public one: integrity, authenticity and non-repudiation — and how batching signatures with a Merkle tree cuts their cost.',
   minutes: 11,
   level: 'Intermediate',

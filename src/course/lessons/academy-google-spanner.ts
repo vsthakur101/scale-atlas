@@ -16,7 +16,7 @@ const paxosFlow = [flow(['a', 'b'], { kind: 'write', back: true, rate: 1 }), flo
 
 const lesson: Lesson = {
   slug: 'academy-google-spanner',
-  title: 'Google Spanner',
+  title: 'Spanner-Style Databases: Global Consistency with TrueTime',
   blurb: 'A globally distributed SQL database that gives every transaction one true order — by making the uncertainty of clocks explicit, and waiting it out.',
   minutes: 14,
   level: 'Advanced',

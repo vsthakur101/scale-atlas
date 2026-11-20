@@ -48,7 +48,7 @@ function roundsToConverge(n: number, fanout: number): { rounds: number; curve: n
 
 const lesson: Lesson = {
   slug: 'academy-gossip-protocol',
-  title: 'Gossip Protocol',
+  title: 'Gossip Protocols: Epidemic Spread of State',
   blurb: 'Spread information through a cluster the way rumours spread: every node tells a few random peers each second — and everyone knows within a handful of rounds.',
   minutes: 12,
   level: 'Intermediate',

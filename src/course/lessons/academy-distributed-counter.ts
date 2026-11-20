@@ -14,7 +14,7 @@ const fmt = (n: number): string => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >=
 
 const lesson: Lesson = {
   slug: 'academy-distributed-counter',
-  title: 'Distributed Counter',
+  title: 'Counting at Scale: Sharded and Approximate Counters',
   blurb: 'Counting likes, views or stock without a single hot row: sharded counters, batching, cached reads and CRDTs — and the correctness traps of each.',
   minutes: 13,
   level: 'Intermediate',

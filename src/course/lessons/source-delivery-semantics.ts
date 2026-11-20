@@ -10,7 +10,7 @@ const fmtBytes = (b: number): string => (b >= 1e9 ? `${(b / 1e9).toFixed(1)} GB`
 
 const lesson: Lesson = {
   slug: 'source-delivery-semantics',
-  title: 'Delivery Semantics',
+  title: 'At-Most-Once, At-Least-Once and Exactly-Once Delivery',
   blurb: 'At-most-once, at-least-once and “exactly-once”: what a network failure forces you to choose, and how Kafka-style systems and idempotent consumers fake the third.',
   minutes: 13,
   level: 'Advanced',

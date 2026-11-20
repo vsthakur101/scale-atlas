@@ -9,7 +9,7 @@ const fmtMs = (ms: number): string => (ms >= 1000 ? `${(ms / 1000).toFixed(1)} s
 
 const lesson: Lesson = {
   slug: 'academy-consistency-patterns',
-  title: 'Consistency Patterns',
+  title: 'Read-Your-Writes, Monotonic Reads and Other Consistency Patterns',
   blurb: 'From “eventual” to “strong”, and the practical middle: read-your-writes, monotonic reads and causal order — what each prevents and how it is implemented.',
   minutes: 13,
   level: 'Intermediate',

@@ -10,7 +10,7 @@ const fmtMs = (ms: number): string => (ms >= 1000 ? `${(ms / 1000).toFixed(1)} s
 
 const lesson: Lesson = {
   slug: 'source-pessimistic-vs-optimistic-locking',
-  title: 'Pessimistic vs Optimistic Locking',
+  title: 'Locking Strategies: Pessimistic Locks vs Optimistic Versioning',
   blurb: 'Lock first and wait, or proceed and check at commit: how the two strategies behave at low and high contention, what each wastes, and how version columns implement the optimistic one.',
   minutes: 12,
   level: 'Intermediate',

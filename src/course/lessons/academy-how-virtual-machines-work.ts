@@ -23,7 +23,7 @@ const fmtS = (s: number): string => (s >= 120 ? `${(s / 60).toFixed(1)} min` : `
 
 const lesson: Lesson = {
   slug: 'academy-how-virtual-machines-work',
-  title: 'How Virtual Machines Work',
+  title: 'Virtual Machines: Hypervisors, Hardware Virtualisation and Overhead',
   blurb: 'Hypervisors, hardware-assisted CPU and memory virtualization, virtio and passthrough I/O — plus the statistics of overcommit and the arithmetic of live migration.',
   minutes: 14,
   level: 'Advanced',

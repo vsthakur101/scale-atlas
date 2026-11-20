@@ -57,7 +57,9 @@ cheat sheets (AWS/Azure/GCP), and duplicates of the above. Some belong in the Ch
 Mostly links to external engineering articles (Figma, Slack, Airbnb…) and UI component patterns. A different audience and
 largely commentary on other people's writing; hidden until there is a real front-end track plan.
 
-## When the queue is done
+## Index cleanup (DONE 2026-11-20)
 
-Reduce `source-index.ts`, `academy-index.ts` and `front-end-index.ts` to the published entries and delete the unused wrapper
-files, so the repo does not carry ~700 dead stubs.
+`source-index.ts` and `academy-index.ts` now contain only authored lessons (171); `front-end-index.ts`, `published.ts`,
+`topic-lesson.ts` and the 729 generated placeholder files were deleted (recoverable from git history). The title-only
+backlog is preserved in `docs/unwritten-topics.md`. Two entries that had been marked published but lacked a `load`
+function (AI evals/guardrails, multi-agent architectures) were fixed and now open normally.

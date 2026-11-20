@@ -12,7 +12,7 @@ const fmtMin = (m: number): string => (m >= 60 ? `${(m / 60).toFixed(1)} h` : m 
 
 const lesson: Lesson = {
   slug: 'academy-how-ci-cd-works',
-  title: 'How CI/CD Works',
+  title: 'CI/CD Pipelines: From Commit to Production',
   blurb: 'Build, test, package, deploy on every change — and the queueing and flakiness arithmetic that decides whether the pipeline helps or becomes the bottleneck.',
   minutes: 12,
   level: 'Beginner',

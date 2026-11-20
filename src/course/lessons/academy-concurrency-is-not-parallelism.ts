@@ -13,7 +13,7 @@ const fmtX = (x: number): string => `${x.toFixed(x < 10 ? 2 : 1)}×`;
 
 const lesson: Lesson = {
   slug: 'academy-concurrency-is-not-parallelism',
-  title: 'Concurrency Is Not Parallelism',
+  title: 'Concurrency vs Parallelism: Structure, Speed and Amdahl\'s Law',
   blurb: 'Structuring a program as many things in progress is not the same as running many things at the same instant — and each solves a different problem with a different limit.',
   minutes: 12,
   level: 'Intermediate',

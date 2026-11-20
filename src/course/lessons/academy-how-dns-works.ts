@@ -13,7 +13,7 @@ const fmtT = (s: number): string => (s >= 86400 ? `${(s / 86400).toFixed(1)} day
 
 const lesson: Lesson = {
   slug: 'academy-how-dns-works',
-  title: 'How DNS Works',
+  title: 'DNS Resolution: Caches, Recursion and the Name Hierarchy',
   blurb: 'The hierarchy of resolvers and name servers, caching by TTL, and the trade-off every record carries: fewer lookups versus faster change.',
   minutes: 12,
   level: 'Beginner',

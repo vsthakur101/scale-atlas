@@ -11,7 +11,7 @@ const fmtQ = (q: number): string => (q >= 1000 ? `${Math.round(q).toLocaleString
 
 const lesson: Lesson = {
   slug: 'academy-actor-model',
-  title: 'The Actor Model',
+  title: 'The Actor Model: Mailboxes, Supervision and Message Passing',
   blurb: 'Isolated state, mailboxes, one message at a time and supervision trees: concurrency without locks, and the new problems that come with it.',
   minutes: 13,
   level: 'Intermediate',

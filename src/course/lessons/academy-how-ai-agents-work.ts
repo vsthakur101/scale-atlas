@@ -12,7 +12,7 @@ const fmtT = (s: number): string => (s >= 120 ? `${(s / 60).toFixed(1)} min` : `
 
 const lesson: Lesson = {
   slug: 'academy-how-ai-agents-work',
-  title: 'How AI Agents Work',
+  title: 'AI Agents: The Plan–Act–Observe Loop',
   blurb: 'A model in a loop with tools: plan, act, observe, repeat — and the arithmetic of why agents cost more per step as they go, fail more with every step, and need guardrails.',
   minutes: 14,
   level: 'Intermediate',

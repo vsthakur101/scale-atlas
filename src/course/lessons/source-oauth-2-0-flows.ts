@@ -10,7 +10,7 @@ const fmtR = (r: number): string => (r >= 1e6 ? `${(r / 1e6).toFixed(1)}M/s` : r
 
 const lesson: Lesson = {
   slug: 'source-oauth-2-0-flows',
-  title: 'OAuth 2.0 Flows',
+  title: 'OAuth 2.0 Grant Flows Compared',
   blurb: 'Delegated access without sharing passwords: the authorization-code flow with PKCE, client credentials, device code — and what token lifetime does to load and risk.',
   minutes: 14,
   level: 'Intermediate',

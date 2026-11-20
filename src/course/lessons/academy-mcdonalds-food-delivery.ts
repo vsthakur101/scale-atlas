@@ -3,7 +3,7 @@ import { box, crowd, db, flow, link, pill, you } from '../kit';
 
 const lesson: Lesson = {
   slug: 'academy-how-mcdonald-s-food-delivery-platform-handles-20-000-orders-per-second',
-  title: 'How McDonald’s Food Delivery Platform Handles 20,000 Orders per Second',
+  title: 'Order-Platform Throughput: A 20,000-Orders-per-Second Case Study',
   blurb: 'Trace a food order through checkout, payment, restaurant routing, durable queues, fulfilment, and recovery.',
   minutes: 14,
   level: 'Advanced',

@@ -33,7 +33,7 @@ const fmtRate = (n: number): string => (n >= 1000 ? `${(n / 1000).toFixed(n >= 1
 
 const lesson: Lesson = {
   slug: 'academy-bloom-filter',
-  title: 'Bloom Filter',
+  title: 'Bloom Filters: Probabilistic Set Membership',
   blurb: 'Answer “is this key in the set?” in a few bits per key — with no false negatives and a false-positive rate you can calculate and tune.',
   minutes: 13,
   level: 'Intermediate',

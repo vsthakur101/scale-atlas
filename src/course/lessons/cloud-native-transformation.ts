@@ -3,7 +3,7 @@ import { box, crowd, db, disk, flow, link, pill, you } from '../kit';
 
 const lesson: Lesson = {
   slug: 'source-how-to-transform-a-system-to-be-cloud-native',
-  title: 'How to Transform a System to be Cloud Native',
+  title: 'Moving a System to Cloud-Native: A Migration Playbook',
   blurb: 'Move from fragile host-specific operations to small, replaceable services with declarative infrastructure and resilient delivery.',
   minutes: 12,
   level: 'Advanced',

@@ -25,7 +25,7 @@ const availFmt = (minutes: number): string => `${(100 * (1 - minutes / 525_600))
 
 const lesson: Lesson = {
   slug: 'academy-cell-based-architecture',
-  title: 'Cell Based Architecture',
+  title: 'Cell Architecture: Isolating Blast Radius with Independent Cells',
   blurb: 'Run many small, independent copies of your whole stack and give each customer exactly one — so any failure, bad deploy or noisy neighbour hurts only a slice of users.',
   minutes: 12,
   level: 'Advanced',

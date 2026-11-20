@@ -10,7 +10,7 @@ const node = (i: number, name: string, extra: Partial<SceneNode> = {}) => box(`n
 
 const lesson: Lesson = {
   slug: 'academy-how-kubernetes-works',
-  title: 'How Kubernetes Works',
+  title: 'Kubernetes Internals: Control Plane, Scheduler and Nodes',
   blurb: 'A cluster that continuously reconciles what you declared with what is running: API server, etcd, controllers, scheduler and kubelet — plus the arithmetic of packing and autoscaling.',
   minutes: 15,
   level: 'Intermediate',

@@ -11,7 +11,7 @@ const fmtS = (s: number): string => (s >= 3600 ? `${(s / 3600).toFixed(1)} h` : 
 
 const lesson: Lesson = {
   slug: 'academy-how-terraform-works',
-  title: 'How Terraform Works',
+  title: 'Terraform: Declarative Infrastructure, State and Plans',
   blurb: 'Declare infrastructure, diff it against recorded state and reality, execute the dependency graph in parallel — and why one big state file is a blast radius.',
   minutes: 12,
   level: 'Intermediate',

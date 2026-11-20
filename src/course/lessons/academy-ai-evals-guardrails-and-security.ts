@@ -11,7 +11,7 @@ const fmtN = (n: number): string => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >
 
 const lesson: Lesson = {
   slug: 'academy-ai-evals-guardrails-and-security',
-  title: 'AI Evals, Guardrails and Security',
+  title: 'Evaluating and Securing AI Systems: Evals and Guardrails',
   blurb: 'How to know whether a model-based system works (with error bars), how layered guardrails trade misses against false blocks, and why prompt injection can’t be solved by a prompt.',
   minutes: 14,
   level: 'Intermediate',

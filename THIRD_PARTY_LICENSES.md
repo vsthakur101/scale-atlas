@@ -30,3 +30,24 @@ Scale Atlas uses topic titles and the source repository's public index structure
 under the MIT license. Lesson narratives, isometric scenes, formulas, and
 assets in Scale Atlas are original to this project; upstream article prose,
 paid guide content, diagrams, and images are not copied.
+
+---
+
+## Title sources and licence status (reviewed 2026-11-20)
+
+Scale Atlas’s topic lessons are original work. The only third-party material in the code is a short **title** per
+lesson (`src/course/source-index.ts`, `src/course/academy-index.ts`), used as a topic reference. No upstream prose,
+diagrams, images or code is copied.
+
+| Index file | Title source | Licence status |
+| --- | --- | --- |
+| `source-index.ts` | ByteByteGoHq/system-design-101 topic titles | **Not verified.** Public metadata labels the repository licence as custom/“other” (one aggregator says MIT; the others disagree). Read the repository’s `LICENSE` file before public release. |
+| `academy-index.ts` | systemdesign42/system-design-academy topic titles | **Not verified.** Public metadata labels the licence “other” with a `LICENSE.md` (likely custom). Read it before public release. |
+| _(removed)_ | greatfrontend/awesome-front-end-system-design | MIT (notice above). The front-end index and its titles were deleted in the 2026-11-20 cleanup; no material from it remains in the shipped code. |
+
+**Renamed (2026-11-20):** every index title and lesson title now uses Scale Atlas’s own wording — none of the 171
+topic lessons carries its source list’s title verbatim (generic topic names such as “Bloom Filters” or “Kafka” remain,
+as they name the subject itself). The module (section) names in the index files are generic categories. What remains
+derived from the two unverified sources is therefore only the *choice of topics* and the slug identifiers
+(`source-…`, `academy-…`), which are internal route names. Still worth reading both `LICENSE` files before public
+release, and renaming slugs/section names if you want zero overlap. This is a review of public metadata, not legal advice.
