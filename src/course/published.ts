@@ -188,4 +188,14 @@ export const PUBLISHED: ReadonlySet<string> = new Set([
   'source-types-of-memory-and-storage',
   'source-how-to-avoid-crawling-duplicate-urls-at-google-scale',
   'academy-api-versioning',
+  // batch 20
+  'source-what-happens-when-you-type-a-url-into-your-browser',
+  'source-top-5-strategies-to-reduce-latency',
+  'source-top-4-data-sharding-algorithms-explained',
+  'source-osi-model-explained',
+  'source-design-gmail',
+  'source-design-google-maps',
+  'source-how-do-we-manage-configurations-in-a-system',
+  'source-git-merge-vs-git-rebase',
+  'source-how-do-we-manage-sensitive-data-in-a-system',
 ]);
