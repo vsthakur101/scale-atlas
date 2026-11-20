@@ -148,4 +148,14 @@ export const PUBLISHED: ReadonlySet<string> = new Set([
   'academy-how-cloudflare-was-able-to-support-55-million-requests-per-second-with-only-15-postgres-clusters',
   'source-what-is-sso-single-sign-on',
   'academy-how-shopify-handled-30tb-per-minute-with-a-modular-monolith-architecture',
+  // batch 16
+  'source-memcached-vs-redis',
+  'source-how-does-redis-persist-data',
+  'source-how-does-rest-api-work',
+  'source-read-replica-pattern',
+  'source-symmetric-vs-asymmetric-encryption',
+  'source-logging-tracing-and-metrics',
+  'academy-amazon-prime-video-microservices-top-failure',
+  'academy-tumblr-shares-database-migration-strategy-with-60-billion-rows',
+  'academy-this-is-how-airbnb-adopted-http-streaming-to-save-84-million-usd-in-costs',
 ]);
