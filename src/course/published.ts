@@ -138,4 +138,14 @@ export const PUBLISHED: ReadonlySet<string> = new Set([
   'source-reconciliation-in-payment',
   'source-how-do-apple-pay-and-google-pay-work',
   'source-resiliency-patterns',
+  // batch 15
+  'source-linux-boot-process-explained',
+  'source-how-does-ssh-work',
+  'source-4-ways-of-qr-code-payment',
+  'source-what-does-acid-mean',
+  'academy-how-instagram-scaled-to-2-5-billion-users',
+  'academy-how-figma-scaled-postgres-to-4m-users',
+  'academy-how-cloudflare-was-able-to-support-55-million-requests-per-second-with-only-15-postgres-clusters',
+  'source-what-is-sso-single-sign-on',
+  'academy-how-shopify-handled-30tb-per-minute-with-a-modular-monolith-architecture',
 ]);
